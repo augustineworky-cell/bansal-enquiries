@@ -725,7 +725,7 @@ zip.file('documents_manifest.csv', manifestRows.join('\n'));
     }
     
 var readmeLines = [
-      'MakeMyClicks CRM — Full Backup',
+      'Bansal Material House CRM — Full Backup',
       '=================================',
       '',
       'Created: ' + new Date().toISOString(),
@@ -756,7 +756,7 @@ var readmeLines = [
     var zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
     
     var stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-    var fname = 'MMC_Full_Backup_' + stamp + '.zip';
+    var fname = 'BMH_Full_Backup_' + stamp + '.zip';
     var dlUrl = URL.createObjectURL(zipBlob);
     var link = document.createElement('a');
     link.href = dlUrl;

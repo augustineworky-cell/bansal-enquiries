@@ -330,7 +330,7 @@ const exportReports = () => {
     var year = d.getFullYear();
     var month = ('0' + (d.getMonth() + 1)).slice(-2);
     var day = ('0' + d.getDate()).slice(-2);
-    var filename = 'MMC_Report_' + year + '-' + month + '-' + day + '.csv';
+    var filename = 'BMH_Report_' + year + '-' + month + '-' + day + '.csv';
     if (typeof exportToCSV === 'function') {
       exportToCSV(currentReportData, filename);
     }

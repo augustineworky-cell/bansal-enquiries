@@ -1,5 +1,5 @@
 // ============================================================
-// MMC CRM — FEATURES.JS (Daily Operational Feature Modules)
+// Bansal Material House CRM — FEATURES.JS (Daily Operational Feature Modules)
 // ============================================================
 
 // ──────────────────────────────────────────────────────────
@@ -765,7 +765,7 @@ function generateWhatsAppLink(mobile, name) {
   if (!mobile) return; 
   let cl = String(mobile).replace(/\D/g, ''); 
   if (cl.length > 10 && cl.indexOf('91') === 0) cl = cl.substring(2); 
-  const msg = 'Hi ' + name + ', this is ' + currentUser.name + ' from MakeMyClicks.'; 
+  const msg = 'Hi ' + name + ', this is ' + currentUser.name + ' from Bansal Material House.'; 
   window.open('https://wa.me/91' + cl + '?text=' + encodeURIComponent(msg), '_blank'); 
 }
 

@@ -14,8 +14,8 @@ var currentFuCampaign = '';
 
 // ========== SUPABASE INITIALIZATION ==========
 var supabaseClient = supabase.createClient(
-  window.MMC_CONFIG.SUPABASE_URL,
-  window.MMC_CONFIG.SUPABASE_ANON_KEY
+  window.BMH_CONFIG.SUPABASE_URL,
+  window.BMH_CONFIG.SUPABASE_ANON_KEY
 );
 
 var currentUser = null;

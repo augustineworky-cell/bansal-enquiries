@@ -1,8 +1,8 @@
 // ============================================================
-// MOUSEPAD PRICE CALCULATOR — NEO DOVE CRM
-// Ported from PriceV3 (MakeMyClicks Price Catalog)
+// MOUSEPAD PRICE CALCULATOR — BANSAL MATERIAL HOUSE CRM
+// Ported from PriceV3 (Bansal Material House Price Catalog)
 // ============================================================
-// Tables required in Neo Dove Supabase (tfxkcujcfelovxowdhis):
+// Tables required in Bansal Material House Supabase (tfxkcujcfelovxowdhis):
 //   - mousepad_calc_settings
 //   - mousepad_thickness_options
 // See: supabase-setup.sql for CREATE TABLE statements
@@ -40,17 +40,17 @@
   const fmtBig = (n) => '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   function getSupabase() {
-    // Neo Dove uses global supabaseClient (set in api.js)
+    // Bansal Material House uses global supabaseClient (set in api.js)
     if (window.supabaseClient) return window.supabaseClient;
-    // Fallback: create using MMC_CONFIG
-    if (window.MMC_CONFIG && window.supabase) {
-      return window.supabase.createClient(window.MMC_CONFIG.SUPABASE_URL, window.MMC_CONFIG.SUPABASE_ANON_KEY);
+    // Fallback: create using BMH_CONFIG
+    if (window.BMH_CONFIG && window.supabase) {
+      return window.supabase.createClient(window.BMH_CONFIG.SUPABASE_URL, window.BMH_CONFIG.SUPABASE_ANON_KEY);
     }
     throw new Error('Supabase client not available');
   }
 
   function mcToast(msg, type) {
-    // Use Neo Dove's showToast if available, else fallback
+    // Use Bansal Material House's showToast if available, else fallback
     if (typeof showToast === 'function') { showToast(msg, type); return; }
     if (typeof showNotification === 'function') { showNotification(msg, type); return; }
     alert(msg);
@@ -368,7 +368,7 @@
     return role === 'ADMIN' || role === 'EA';
   }
 
-  // ── MAIN LOAD FUNCTION (called by Neo Dove showPage) ────────
+  // ── MAIN LOAD FUNCTION (called by Bansal Material House showPage) ────────
   window.loadPriceCalculator = async function () {
     if (!mc.initialized) {
       wireInputs();

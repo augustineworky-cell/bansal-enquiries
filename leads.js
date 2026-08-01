@@ -509,7 +509,7 @@ function exportContacts() {
     return;
   }
   var dateStr = new Date().toISOString().slice(0, 10);
-  exportToCSV(currentFilteredLeads, 'MMC_Leads_' + dateStr + '.csv');
+  exportToCSV(currentFilteredLeads, 'BMH_Leads_' + dateStr + '.csv');
 }
 
 // ──────────────────────────────────────────────────────────
@@ -1156,7 +1156,7 @@ function downloadLeadTemplate() {
   var url = URL.createObjectURL(blob);
   var link = document.createElement('a');
   link.href = url;
-  link.download = 'MMC_Leads_Template.csv';
+  link.download = 'BMH_Leads_Template.csv';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1455,7 +1455,7 @@ function bulkExportSelected() {
     return;
   }
   var dateStr = new Date().toISOString().slice(0, 10);
-  exportToCSV(selected, 'MMC_Selected_Leads_' + dateStr + '.csv');
+  exportToCSV(selected, 'BMH_Selected_Leads_' + dateStr + '.csv');
 }
 
 function bulkDeleteSelected() {  if (selectedLeadIds.length === 0) { showToast('Select at least one lead', 'warning'); return; }
