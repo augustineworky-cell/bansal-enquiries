@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MakeMyClicks CRM</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="style.css?v=2">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  
+  <div class="app-container" id="appContainer">
+    
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <header class="logo-area">
+        <div class="logo-box">M</div>
+        <div class="logo-text">MakeMyClicks</div>
+      </header>
+      
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">
+          <i data-lucide="layout-grid"></i> Dashboard
+          <span id="overdueBadge" class="nav-badge pulse" style="display:none;">0</span>
+        </a>
+        <a href="#" class="nav-item" data-page="contacts" onclick="showPage('contacts', this)">
+          <i data-lucide="users"></i> Contacts
+        </a>
+        <a href="#" class="nav-item" data-page="mytasks" onclick="showPage('mytasks', this)" style="position:relative;">
+          <i data-lucide="check-square"></i> My Tasks
+          <span id="taskBadge" class="nav-badge" style="display:none; background:var(--warning);">0</span>
+        </a>
+        <a href="#" class="nav-item" data-page="calendar" onclick="showPage('calendar', this)">
+          <i data-lucide="calendar"></i> Calendar
+        </a>
+        <a href="#" class="nav-item" data-page="orders" onclick="showPage('orders', this)">
+          <i data-lucide="package"></i> Orders
+        </a>
+        <a href="#" class="nav-item" data-page="quotations" onclick="showPage('quotations', this)">
+          <i data-lucide="file-text"></i> Quotations
+        </a>
+        <a href="#" class="nav-item" data-page="pipeline" onclick="showPage('pipeline', this)">
+          <i data-lucide="git-branch"></i> Pipeline
+        </a>
+        <a href="#" class="nav-item nav-admin" data-page="campaigns" onclick="showPage('campaigns', this)">
+          <i data-lucide="megaphone"></i> Campaigns
+        </a>
+        <a href="#" class="nav-item" data-page="pricecalc" onclick="showPricecalcLanding(this)">
+          <i data-lucide="calculator"></i> Price Calculator
+        </a>
+        <a href="#" class="nav-item" data-page="knowledge" onclick="showPage('knowledge', this)">
+          <i data-lucide="book-open"></i> Knowledge Base
+        </a>
+        <a href="#" class="nav-item nav-admin" data-page="reports" onclick="showPage('reports', this)">
+          <i data-lucide="bar-chart-2"></i> Reports
+        </a>
+        <a href="#" class="nav-item" data-page="leaderboard" onclick="showPage('leaderboard', this)">
+          <i data-lucide="trophy"></i> Leaderboard
+        </a>
+      </nav>
+      
+      <footer class="sidebar-bottom" id="settingsNavItem">
+        <a href="#" class="nav-item nav-admin" data-page="settings" onclick="showPage('settings', this)">
+          <i data-lucide="settings"></i> Settings
+        </a>
+        <a href="#" class="nav-item" onclick="logout()" style="color:var(--danger);">
+          <i data-lucide="log-out"></i> Logout
+        </a>
+      </footer>
+    </aside>
+
+    <main class="main-content">
+      
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobile-toggle" class="mobile-toggle icon-btn" onclick="toggleSidebar()">
+            <i data-lucide="menu"></i>
+          </button>
+          <h1 class="page-title" id="pageTitle">Dashboard</h1>
+        </div>
+        
+        <div class="topbar-right">
+          <div class="agent-switcher admin-only" style="position:relative;">
+            <button class="agent-switcher-btn" onclick="toggleAgentSwitcher(event)" id="agentSwitcherBtn">
+              <i data-lucide="users" style="width:14px;"></i>
+              <span id="agentSwitcherLabel">All Agents</span>
+              <i data-lucide="chevron-down" style="width:12px;"></i>
+            </button>
+            <div class="agent-switcher-dropdown" id="agentSwitcherDropdown" style="display:none;">
+              <div class="agent-switcher-item active" data-agent="" onclick="setViewAsAgent('', this)">
+                <div class="agent-switcher-avatar" style="background:var(--primary); color:white;">
+                  <i data-lucide="globe" style="width:14px;"></i>
+                </div>
+                <div>
+                  <div class="agent-name">All Agents</div>
+                  <div class="agent-role">Team View</div>
+                </div>
+              </div>
+              <div class="agent-switcher-divider"></div>
+              <div id="agentSwitcherList"></div>
+            </div>
+          </div>
+          <button id="breakBtn" class="btn btn-secondary break-btn" onclick="toggleBreak()">
+            <div class="status-dot status-dot-danger"></div> Take Break
+          </button>
+          <button class="icon-btn" onclick="toggleNotifications()">
+            <i data-lucide="bell"></i>
+          </button>
+          <div id="notif-dropdown" class="notif-dropdown">
+            <div class="notif-header">Recent Activity</div>
+            <div id="notif-list"></div>
+          </div>
+          <div class="user-avatar" id="userAvatar" onclick="showProfile()">U</div>
+        </div>
+      </header>
+
+      <div class="agent-view-banner" id="agentViewBanner" style="display:none;">
+        <div class="banner-content">
+          <i data-lucide="eye" style="width:14px;"></i>
+          <span>Viewing as: <b id="bannerAgentName">SHREYA</b></span>
+          <button class="banner-clear" onclick="setViewAsAgent('', null)">
+            <i data-lucide="x" style="width:12px;"></i> Back to Team View
+          </button>
+        </div>
+      </div>
+
+      <div class="page-content">
+
+        <section id="page-dashboard" class="page active">
+          <div class="filter-bar stagger-item">
+            <button class="btn btn-secondary filter-pill active" onclick="setDashboardFilter('all', this)">All Time</button>
+            <button class="btn btn-secondary filter-pill" onclick="setDashboardFilter('today', this)">Today</button>
+            <button class="btn btn-secondary filter-pill" onclick="setDashboardFilter('week', this)">This Week</button>
+            <button class="btn btn-secondary filter-pill" onclick="setDashboardFilter('month', this)">This Month</button>
+          </div>
+          
+          <div class="metric-grid">
+            <div class="metric-card mc-default stagger-item">
+              <div class="metric-label">Total Leads</div>
+              <div class="metric-num" id="metric-total">0</div>
+              <i data-lucide="users" class="metric-icon"></i>
+            </div>
+            <div class="metric-card mc-warning stagger-item">
+              <div class="metric-label">In Progress</div>
+              <div class="metric-num" id="metric-inprog">0</div>
+              <i data-lucide="refresh-cw" class="metric-icon"></i>
+            </div>
+            <div class="metric-card mc-success stagger-item">
+              <div class="metric-label">Converted</div>
+              <div class="metric-num" id="metric-won">0</div>
+              <i data-lucide="check-circle" class="metric-icon"></i>
+            </div>
+            <div class="metric-card mc-danger stagger-item">
+              <div class="metric-label">Lost</div>
+              <div class="metric-num" id="metric-lost">0</div>
+              <i data-lucide="x-circle" class="metric-icon"></i>
+            </div>
+            <div class="metric-card mc-overdue stagger-item">
+              <div class="metric-label">Overdue</div>
+              <div class="metric-num" id="metric-overdue">0</div>
+              <i data-lucide="alert-triangle" class="metric-icon"></i>
+            </div>
+          </div>
+
+          <div class="card mb-24 stagger-item">
+            <header class="card-header">
+              <h3>Today's Follow-Ups <span class="badge badge-followup" id="todayFuCount">0</span></h3>
+            </header>
+            <div class="table-container">
+             <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Mobile</th><th>Campaign</th><th>Assigned To</th><th>Stage</th><th>Follow-Up</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="todayFuTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="dashboard-3col">
+            <div class="card stagger-item">
+              <h3>Pinned Campaigns</h3>
+              <div id="pinnedCampaignsList" class="campaign-list"></div>
+            </div>
+            <div class="card stagger-item">
+              <h3>Lead Source Summary</h3>
+              <div class="donut-container">
+                <div class="donut-chart" id="sourceDonut">
+                  <div class="donut-inner" id="donutTotal">0</div>
+                </div>
+              </div>
+              <div class="donut-legend" id="sourceLegend"></div>
+              <div class="source-analytics">
+                <table>
+                  <thead>
+                    <tr><th>Source</th><th>Total</th><th>Won</th><th>Rate</th></tr>
+                  </thead>
+                  <tbody id="sourceAnalyticsBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card stagger-item">
+              <h3>Calls Analysis</h3>
+              <div class="call-stats">
+                <div class="stat-row"><span>Attempted</span><strong id="call-attempted">0</strong></div>
+                <div class="stat-row"><span>Connected</span><strong id="call-connected" class="text-success">0</strong></div>
+                <div class="stat-row"><span>Connect Rate</span><strong id="call-rate" class="text-info">0%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="quick-actions-row admin-only stagger-item">
+            <button class="card action-btn" onclick="openBulkUploadModal()">
+              <div class="action-btn-content">
+                <div class="action-icon action-icon-success"><i data-lucide="upload-cloud"></i></div>
+                <span>Upload Leads</span>
+              </div>
+              <i data-lucide="arrow-right"></i>
+            </button>
+            <button class="card action-btn" onclick="showPage('campaigns', document.querySelector('[data-page=campaigns]')); openCreateCampaignModal();">
+              <div class="action-btn-content">
+                <div class="action-icon action-icon-primary"><i data-lucide="plus-circle"></i></div>
+                <span>Create Campaign</span>
+              </div>
+              <i data-lucide="arrow-right"></i>
+            </button>
+          </div>
+        </section>
+
+<section id="page-contacts" class="page">
+          <header class="page-header stagger-item" style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+            <h2 style="font-size:18px; font-weight:600; margin:0;">All Contacts</h2>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-export" onclick="exportContacts()"><i data-lucide="download" class="icon-sm"></i> Export</button>
+              <button class="btn btn-primary" onclick="openAddLeadModal()"><i data-lucide="plus" class="icon-sm"></i> Add Lead</button>
+            </div>
+          </header>
+          <div class="card filter-bar stagger-item" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:12px 16px;">
+            <input type="text" id="contactSearch" class="form-input" placeholder="Search name, mobile, email..." onkeyup="debouncedSearch()" style="flex:2; min-width:200px;">
+            <select id="contactSourceFilter" class="form-input" onchange="filterLeadsClient()" style="flex:1; min-width:140px;">
+              <option value="">All Sources</option>
+              <option>FACEBOOK</option>
+              <option>INDIAMART</option>
+              <option>WALK_IN</option>
+              <option>WEBSITE</option>
+              <option>JUSTDIAL</option>
+              <option>WHATSAPP</option>
+              <option>REFERRAL</option>
+              <option>GOOGLE_SHEET</option>
+            </select>
+            <select id="contactPipelineFilter" class="form-input" onchange="filterLeadsClient()" style="flex:1; min-width:140px;"></select>
+            <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+              <label style="font-size:11px; color:var(--text-secondary); font-weight:600; white-space:nowrap;">FROM</label>
+              <input type="date" id="contactDateFrom" class="form-input" onchange="filterLeadsClient()" style="width:140px; padding:8px 10px;">
+              <label style="font-size:11px; color:var(--text-secondary); font-weight:600; white-space:nowrap;">TO</label>
+              <input type="date" id="contactDateTo" class="form-input" onchange="filterLeadsClient()" style="width:140px; padding:8px 10px;">
+              <button class="btn btn-secondary" onclick="clearDateFilter()" title="Clear date filter" style="padding:8px 10px; flex-shrink:0;"><i data-lucide="x" style="width:14px;"></i></button>
+            </div>
+            <button class="btn btn-primary" onclick="filterLeadsClient()" style="flex-shrink:0;"><i data-lucide="search" class="icon-sm"></i> Search</button>
+          </div>
+
+<div class="contacts-header-row">
+            <div class="contacts-count" id="contactsCount">Loading...</div>
+          </div>
+
+          <div id="columnFilterBanner" style="display:none;"></div>
+
+          <div id="activeTagFilters" class="tag-filter-row stagger-item"></div>
+
+          <div class="bulk-action-bar" id="bulkActionBar" style="display:none;">
+            <div class="bulk-count"><b id="bulkSelectedCount">0</b> leads selected</div>
+            <div class="bulk-actions">
+              <button class="btn btn-secondary" onclick="openBulkReassignModal()">
+                <i data-lucide="user-plus" style="width:14px;"></i> Reassign
+              </button>
+              <button class="btn btn-secondary" onclick="openBulkTagModal()">
+                <i data-lucide="tag" style="width:14px;"></i> Add Tag
+              </button>
+              <button class="btn btn-secondary" onclick="openBulkStageModal()">
+                <i data-lucide="trending-up" style="width:14px;"></i> Change Stage
+              </button>
+              <button class="btn btn-secondary" onclick="bulkExportSelected()">
+                <i data-lucide="download" style="width:14px;"></i> Export
+              </button>
+              <button class="btn admin-only" style="background:var(--danger); color:#fff;" onclick="bulkDeleteSelected()">
+                <i data-lucide="trash-2" style="width:14px;"></i> Delete
+              </button>
+            </div>
+            <button class="bulk-clear" onclick="clearBulkSelection()">
+              <i data-lucide="x" style="width:14px;"></i> Clear
+            </button>
+          </div>
+
+<div class="card table-container stagger-item">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width:40px;"><input type="checkbox" id="bulkSelectAll" onchange="toggleSelectAll(this)"></th>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Product</th>
+                  <th>Mobile</th>
+                  <th data-column-key="STATE">
+                    <div class="th-inner">
+                      <span>State</span>
+                      <button class="th-filter-btn" type="button"><i data-lucide="filter"></i></button>
+                    </div>
+                  </th>
+                  <th data-column-key="BUYER_TYPE">
+                    <div class="th-inner">
+                      <span>Buyer Type</span>
+                      <button class="th-filter-btn" type="button"><i data-lucide="filter"></i></button>
+                    </div>
+                  </th>
+                  <th data-column-key="LEAD_SOURCE">
+                    <div class="th-inner">
+                      <span>Source</span>
+                      <button class="th-filter-btn" type="button"><i data-lucide="filter"></i></button>
+                    </div>
+                  </th>
+                  <th>Campaign</th>
+                  <th data-column-key="ASSIGNED_TO">
+                    <div class="th-inner">
+                      <span>Assigned</span>
+                      <button class="th-filter-btn" type="button"><i data-lucide="filter"></i></button>
+                    </div>
+                  </th>
+                  <th data-column-key="STAGE">
+                    <div class="th-inner">
+                      <span>Stage</span>
+                      <button class="th-filter-btn" type="button"><i data-lucide="filter"></i></button>
+                    </div>
+                  </th>
+                  <th data-column-key="LEAD_TYPE">
+                    <div class="th-inner">
+                      <span>Type</span>
+                      <button class="th-filter-btn" type="button"><i data-lucide="filter"></i></button>
+                    </div>
+                  </th>
+                  <th>Score</th>
+                  <th>Next Follow-Up</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="contactsTableBody"></tbody>
+            </table>
+          </div>
+          
+          <div class="pagination-container" id="contactsPagination"></div>
+         
+        </section>
+
+        <section id="page-mytasks" class="page">
+          <div class="card mb-24 stagger-item">
+            <div class="task-tabs">
+              <button class="task-tab active" data-filter="today" onclick="switchTaskTab('today', this)">
+                Today <span class="task-tab-count" id="taskCountToday">0</span>
+              </button>
+              <button class="task-tab" data-filter="overdue" onclick="switchTaskTab('overdue', this)">
+                Overdue <span class="task-tab-count overdue" id="taskCountOverdue">0</span>
+              </button>
+              <button class="task-tab" data-filter="upcoming" onclick="switchTaskTab('upcoming', this)">
+                Upcoming <span class="task-tab-count" id="taskCountUpcoming">0</span>
+              </button>
+              <button class="task-tab" data-filter="completed" onclick="switchTaskTab('completed', this)">
+                Completed <span class="task-tab-count" id="taskCountCompleted">0</span>
+              </button>
+            </div>
+          </div>
+          <div id="taskList" class="task-list"></div>
+        </section>
+
+        <section id="page-calendar" class="page">
+          <div class="card stagger-item" style="margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button class="icon-btn" onclick="calNavigate(-1)"><i data-lucide="chevron-left"></i></button>
+                <h3 id="calMonthLabel" style="margin:0; min-width:160px; text-align:center;">April 2026</h3>
+                <button class="icon-btn" onclick="calNavigate(1)"><i data-lucide="chevron-right"></i></button>
+                <button class="btn btn-secondary" onclick="calGoToday()" style="padding:6px 12px; font-size:12px;">Today</button>
+              </div>
+              <div style="display:flex; gap:16px; font-size:11px; color:var(--text-secondary);">
+                <span><span style="display:inline-block; width:8px; height:8px; background:var(--danger); border-radius:50%; margin-right:4px;"></span>Overdue</span>
+                <span><span style="display:inline-block; width:8px; height:8px; background:var(--warning); border-radius:50%; margin-right:4px;"></span>Today</span>
+                <span><span style="display:inline-block; width:8px; height:8px; background:var(--info); border-radius:50%; margin-right:4px;"></span>Upcoming</span>
+              </div>
+            </div>
+          </div>
+          <div class="card stagger-item" id="calendarGrid"></div>
+        </section>
+
+        <section id="page-orders" class="page">
+          <header class="page-header stagger-item">
+            <div>
+              <h2 style="font-size:20px; font-weight:600; margin:0;">Orders</h2>
+              <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">Live from FMS · Read-only view</div>
+            </div>
+            <div style="display:flex; gap:12px;">
+              <button class="btn btn-secondary" onclick="loadOrders()">
+                <i data-lucide="refresh-cw" style="width:14px;"></i> Refresh
+              </button>
+              <a href="https://docs.google.com/spreadsheets/d/1EWoIeJn9PRKPzQ_9YPA0tT3RTJp4IySziRw06bOzs9c/edit" target="_blank" class="btn btn-secondary">
+                <i data-lucide="external-link" style="width:14px;"></i> Open FMS
+              </a>
+            </div>
+          </header>
+          
+          <div class="metric-grid stagger-item">
+            <div class="metric-card mc-default"><div class="metric-label">Total Orders</div><div class="metric-num" id="ordMetricTotal">0</div></div>
+            <div class="metric-card mc-warning"><div class="metric-label">Active</div><div class="metric-num" id="ordMetricActive">0</div></div>
+            <div class="metric-card mc-danger"><div class="metric-label">Delayed</div><div class="metric-num" id="ordMetricDelayed">0</div></div>
+            <div class="metric-card mc-success"><div class="metric-label">Completed</div><div class="metric-num" id="ordMetricDone">0</div></div>
+          </div>
+          
+          <div class="card mb-24 stagger-item">
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <input type="text" id="ordSearch" class="form-input" placeholder="Search order ID, customer, phone..." style="flex:2; min-width:200px;" oninput="filterOrders()">
+              <select id="ordStatusFilter" class="form-input" style="max-width:180px;" onchange="filterOrders()">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="delayed">Delayed</option>
+                <option value="done">Completed</option>
+              </select>
+              <select id="ordSalesFilter" class="form-input" style="max-width:180px;" onchange="filterOrders()">
+                <option value="">All Sales Persons</option>
+                <option value="SHREYA">Shreya</option>
+                <option value="Vandana">Vandana</option>
+                <option value="AKASH">Akash</option>
+                <option value="shubash">Shubash</option>
+                <option value="VIKAS">Vikas</option>
+                <option value="Other:">Other</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="ordersList" class="stagger-item"></div>
+        </section>
+
+        <section id="page-quotations" class="page">
+          <header class="page-header stagger-item">
+            <input type="text" id="quoteSearch" class="form-input" placeholder="Search quotes..." oninput="filterQuotes()" style="max-width:300px;">
+            <button class="btn btn-primary" onclick="openCreateQuoteModal()"><i data-lucide="plus" class="icon-sm"></i> New Quote</button>
+          </header>
+          <div class="metric-grid" id="quoteMetrics"></div>
+          <div class="card table-container stagger-item">
+            <table class="data-table">
+              <thead><tr><th>Quote ID</th><th>Date</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Created By</th><th>Actions</th></tr></thead>
+              <tbody id="quotesTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+<section id="page-pipeline" class="page">
+          <div class="card stagger-item" style="margin-bottom:16px; padding:16px;">
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label style="font-size:13px; font-weight:600; color:var(--text); white-space:nowrap;">Pipeline:</label>
+                <select id="pipelineSelector" class="form-input" style="min-width:140px;" onchange="loadPipeline()"></select>
+              </div>
+              <input type="text" id="pipelineSearch" class="form-input" placeholder="🔍 Name, mobile, company..." onkeyup="debouncedPipelineFilter()" style="flex:1; min-width:200px; max-width:280px;">
+              <select id="pipelineAgentFilter" class="form-input" onchange="filterPipelineClient()" style="min-width:140px;">
+                <option value="">All Agents</option>
+              </select>
+              <select id="pipelineSourceFilter" class="form-input" onchange="filterPipelineClient()" style="min-width:140px;">
+                <option value="">All Sources</option>
+              </select>
+              <select id="pipelineTypeFilter" class="form-input" onchange="filterPipelineClient()" style="min-width:120px;">
+                <option value="">All Types</option>
+                <option value="HOT">HOT</option>
+                <option value="WARM">WARM</option>
+                <option value="COLD">COLD</option>
+              </select>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <label style="font-size:11px; color:var(--text-secondary); font-weight:600;">FROM</label>
+                <input type="date" id="pipelineDateFrom" class="form-input" onchange="filterPipelineClient()" style="width:140px; padding:8px;">
+                <label style="font-size:11px; color:var(--text-secondary); font-weight:600;">TO</label>
+                <input type="date" id="pipelineDateTo" class="form-input" onchange="filterPipelineClient()" style="width:140px; padding:8px;">
+              </div>
+              <button class="btn btn-secondary" onclick="clearPipelineFilters()" style="flex-shrink:0;"><i data-lucide="x" style="width:14px;"></i> Clear</button>
+              <div id="pipelineFilterCount" style="margin-left:auto; font-size:12px; color:var(--text-secondary); font-weight:600;"></div>
+            </div>
+          </div>
+          <div class="card pipeline-selector-card stagger-item" style="display:flex; align-items:center; gap:12px; padding:16px;">
+            <label style="margin:0; font-weight:600;">Select Pipeline</label>
+            <select id="pipelineSelector" class="form-input" style="max-width:250px;" onchange="loadPipeline()"></select>
+          </div>
+          <div class="kanban-board stagger-item" id="kanbanBoard"></div>
+        </section>
+
+        <section id="page-campaigns" class="page admin-only">
+          <header class="page-header stagger-item">
+            <input type="text" id="campaignSearch" class="form-input" placeholder="Search campaigns..." style="max-width:300px;">
+            <button class="btn btn-primary" onclick="openCreateCampaignModal()">Create Campaign</button>
+          </header>
+          <div class="campaigns-grid stagger-item" id="campaignsGrid"></div>
+
+          <div class="card analytics-panel stagger-item" id="campaignAnalyticsPanel" style="display:none; margin-top:24px;">
+            <header class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3 id="campAnalyticsTitle" style="margin:0;">Campaign Analytics</h3>
+              <button class="icon-btn" onclick="document.getElementById('campaignAnalyticsPanel').style.display='none'"><i data-lucide="x"></i></button>
+            </header>
+            <div class="metric-grid" id="campAnalyticsMetrics"></div>
+            <div class="analytics-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px;">
+              <div>
+                <h4>Stage Funnel</h4>
+                <div id="campStageFunnel"></div>
+              </div>
+              <div>
+                <h4>Agent Performance</h4>
+                <table class="data-table compact-table">
+                  <thead><tr><th>Agent</th><th>Total</th><th>Won</th><th>Lost</th></tr></thead>
+                  <tbody id="campAgentTable"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tags-section" style="margin-top:24px;">
+              <h4>Tags by Stage</h4>
+              <div id="campTagsArea" class="tag-cloud"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-knowledge" class="page">
+          <div class="kb-layout stagger-item" style="display:flex; gap:24px; align-items:flex-start;">
+            <aside class="kb-sidebar card" style="width:240px; flex-shrink:0;">
+              <h3 style="margin-bottom: 16px; font-size: 14px;">Categories</h3>
+              <div class="kb-cat active" onclick="setKbCategory('ALL', this)">All <span class="kb-count" id="kbCat-ALL">0</span></div>
+              <div class="kb-cat" onclick="setKbCategory('PRODUCT', this)">Products <span class="kb-count" id="kbCat-PRODUCT">0</span></div>
+              <div class="kb-cat" onclick="setKbCategory('OBJECTION', this)">Objections <span class="kb-count" id="kbCat-OBJECTION">0</span></div>
+              <div class="kb-cat" onclick="setKbCategory('SCRIPT', this)">Scripts <span class="kb-count" id="kbCat-SCRIPT">0</span></div>
+              <div class="kb-cat" onclick="setKbCategory('SOP', this)">SOPs <span class="kb-count" id="kbCat-SOP">0</span></div>
+              <div class="kb-cat" onclick="setKbCategory('FAQ', this)">FAQs <span class="kb-count" id="kbCat-FAQ">0</span></div>
+            </aside>
+            <div class="kb-content" style="flex:1;">
+              <header style="display:flex; justify-content:space-between; gap:16px; margin-bottom: 24px;">
+                <input type="text" id="kbSearch" class="form-input" style="flex:1;" placeholder="Search articles, tags..." oninput="searchKnowledge()">
+                <button class="btn btn-primary admin-only" onclick="openNewArticleModal()">New Article</button>
+              </header>
+              <div id="kbArticleGrid" style="display:flex; flex-direction:column; gap:16px;"></div>
+            </div>
+          </div>
+        </section>
+      
+<section id="page-reports" class="page admin-only" style="max-width:100%;">
+          <header class="page-header stagger-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <h2 style="font-size:18px; font-weight:600; margin:0;">Agent Performance Reports</h2>
+          </header>
+
+          <div id="reportMetrics" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:24px; width:100%;"></div>
+
+          <div class="card stagger-item" style="padding:24px; margin-bottom:24px;">
+            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <h3 style="margin:0; font-size:16px; font-weight:600;">Agent Call Report</h3>
+              <button class="btn btn-secondary btn-export" onclick="exportReports()"><i data-lucide="download" class="icon-sm"></i> Download</button>
+            </header>
+            <div class="table-container" style="margin:0;">
+              <table class="data-table" style="min-width:100%;">
+                <thead><tr><th>Agent</th><th>Attempted</th><th>Connected</th><th>Not Connected</th><th>WhatsApp</th></tr></thead>
+                <tbody id="reportsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card stagger-item" style="padding:24px;">
+            <h3 style="margin:0 0 16px 0; font-size:16px; font-weight:600;">Hourly Login &amp; Call Report</h3>
+            <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+              <select id="lrUser" class="form-input" style="flex:1; min-width:180px; max-width:240px;"></select>
+              <input type="date" id="lrDate" class="form-input" style="flex:1; min-width:160px; max-width:200px;">
+              <button class="btn btn-primary" onclick="loadLoginReport(this)">View Report</button>
+            </div>
+            <div id="lrHourlyChart" class="hourly-chart" style="height:250px; background:var(--surface); border-radius:8px; display:flex; align-items:center; justify-content:center; padding:16px; gap:8px;">
+              <div class="empty-msg">Select a user and date.</div>
+            </div>
+            <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-top:24px;">
+              <div>
+                <h4 style="font-size:14px; font-weight:600; margin-bottom:12px;">Activity Timeline</h4>
+                <div id="lrTimeline" class="timeline-list"></div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div class="metric-card mc-default" style="margin:0;"><div class="metric-label">Total Calls Today</div><div class="metric-num" id="lrTotalCalls">0</div></div>
+                <div class="metric-card mc-danger" style="margin:0;"><div class="metric-label">Total Breaks</div><div class="metric-num" id="lrTotalBreaks">0</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-leaderboard" class="page">
+          <header class="page-header stagger-item" style="justify-content:center;">
+            <div class="lb-period-filter" style="display:flex; gap:8px;">
+              <button class="btn btn-secondary filter-pill" onclick="setLbPeriod('today', this)">Today</button>
+              <button class="btn btn-secondary filter-pill active" onclick="setLbPeriod('week', this)">This Week</button>
+              <button class="btn btn-secondary filter-pill" onclick="setLbPeriod('month', this)">This Month</button>
+              <button class="btn btn-secondary filter-pill" onclick="setLbPeriod('all', this)">All Time</button>
+            </div>
+          </header>
+          <div class="lb-top-three stagger-item" id="lbTopThree" style="display:flex; justify-content:center; align-items:flex-end; gap:24px; min-height:200px; margin-top:24px;"></div>
+          <div class="card table-container stagger-item mt-24">
+            <table class="data-table">
+              <thead><tr><th>Rank</th><th>Agent</th><th>Total Calls</th><th>Connect %</th><th>Conversions</th><th>Pipeline (Lakhs)</th><th>Score</th></tr></thead>
+              <tbody id="lbTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+<section id="page-settings" class="page admin-only">
+          <div class="card mb-24 stagger-item">
+<h3 style="margin-bottom:16px;">Backup &amp; Export</h3>
+            <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+              <div style="flex:1; min-width:280px;">
+                <div style="font-weight:600; font-size:14px; margin-bottom:4px;">Full Backup (Leads + Follow-ups + Documents)</div>
+                <div style="font-size:12px; color:var(--text-secondary);">Downloads a ZIP containing: all lead data (CSV), full follow-up history (CSV), documents manifest (CSV), and every uploaded file. Recommended monthly.</div>
+              </div>
+              <button class="btn btn-primary" onclick="backupAllDocuments(this)" id="backupDocsBtn" style="flex-shrink:0;">
+                <i data-lucide="download-cloud" style="width:16px;"></i> Full Backup
+              </button>
+            </div>
+            <div id="backupProgress" style="display:none; margin-top:16px; padding:12px; background:var(--surface); border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:13px; font-weight:600; margin-bottom:8px;" id="backupStatusText">Preparing...</div>
+              <div style="width:100%; height:6px; background:var(--border); border-radius:3px; overflow:hidden;">
+                <div id="backupProgressBar" style="height:100%; width:0%; background:var(--primary); transition:width 0.3s;"></div>
+              </div>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:6px;" id="backupCountText">0 / 0 files</div>
+            </div>
+          </div>
+
+          <div class="card mb-24 stagger-item">
+            <h3>Global CRM Settings</h3>
+            <div class="settings-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+              <label style="font-weight:600;">Auto-Retry for Not Connected</label>
+              <div class="settings-controls" style="display:flex; gap:8px; align-items:center;">
+                <select id="setRetryEnabled" class="form-input narrow" style="width:80px;"><option value="TRUE">ON</option><option value="FALSE">OFF</option></select>
+                <span style="font-size:13px; color:var(--text-secondary);">Max:</span>
+                <input type="number" id="setRetryMax" class="form-input narrower" style="width:70px;">
+                <span style="font-size:13px; color:var(--text-secondary);">Hrs:</span>
+                <input type="number" id="setRetryInterval" class="form-input narrower" style="width:70px;">
+                <button class="btn btn-primary" onclick="saveRetrySettings(this)">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <nav class="settings-tabs stagger-item" style="display:flex; gap:16px; border-bottom:1px solid var(--border); margin-bottom:24px;">
+            <button class="tab-btn active" style="background:none; border:none; padding:8px 16px; border-bottom:2px solid transparent; cursor:pointer;" onclick="switchSettingsTab('users', this)">Users</button>
+            <button class="tab-btn" style="background:none; border:none; padding:8px 16px; border-bottom:2px solid transparent; cursor:pointer;" onclick="switchSettingsTab('pipelines', this)">Pipelines</button>
+            <button class="tab-btn" style="background:none; border:none; padding:8px 16px; border-bottom:2px solid transparent; cursor:pointer;" onclick="switchSettingsTab('forms', this)">Forms</button>
+            <button class="tab-btn" style="background:none; border:none; padding:8px 16px; border-bottom:2px solid transparent; cursor:pointer;" onclick="switchSettingsTab('workflows', this)">Workflows</button>
+            <button class="tab-btn" style="background:none; border:none; padding:8px 16px; border-bottom:2px solid transparent; cursor:pointer;" onclick="switchSettingsTab('customfields', this)">Custom Fields</button>
+            <button class="tab-btn" style="background:none; border:none; padding:8px 16px; border-bottom:2px solid transparent; cursor:pointer;" onclick="switchSettingsTab('profile', this)">Profile</button>
+            <button class="tab-btn admin-only" style="background:none; border:none; padding:8px 16px; border-bottom:2px solid transparent; cursor:pointer;" onclick="switchSettingsTab('audit', this)">Audit Trail</button>
+          </nav>
+
+          <div class="card table-container stagger-item" id="tab-users">
+            <table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Pipelines</th><th>Actions</th></tr></thead><tbody id="settingsUsersTable"></tbody></table>
+          </div>
+
+          <div class="card stagger-item" id="tab-pipelines" style="display:none;">
+            <header class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <h3>Visual Pipeline Editor</h3>
+              <select id="editorPipelineSelect" class="form-input narrow" onchange="renderPipelineEditor()"></select>
+            </header>
+            <div id="pipelineEditorFlow" class="pipeline-flow" style="display:flex; gap:16px; padding:16px 0; overflow-x:auto;"></div>
+          </div>
+
+          <div class="card stagger-item" id="tab-forms" style="display:none;">
+            <header class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <h3>Engagement Form Builder</h3>
+              <div class="form-actions" style="display:flex; gap:12px;">
+                <select id="formCampaignSelect" class="form-input" onchange="loadFormBuilder()"><option value="">Select Campaign...</option></select>
+                <button class="btn btn-primary" onclick="saveFormBuilder(this)">Save Form</button>
+              </div>
+            </header>
+            <div id="formBuilderContainer" style="padding:16px 0;"><div class="empty-msg">Select a campaign.</div></div>
+          </div>
+
+          <div class="card table-container stagger-item" id="tab-workflows" style="display:none;">
+            <header class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <h3>Workflow Automation</h3>
+              <button class="btn btn-primary" onclick="openCreateWorkflowModal()">Create Workflow</button>
+            </header>
+            <table class="data-table"><thead><tr><th>Name</th><th>Event</th><th>Campaign</th><th>Action</th><th>Status</th><th>Actions</th></tr></thead><tbody id="settingsWorkflowsTable"></tbody></table>
+          </div>
+
+          <div class="card stagger-item" id="tab-customfields" style="display:none;">
+            <header class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3>Custom Contact Properties</h3>
+              <button class="btn btn-primary" onclick="openAddCustomFieldForm()"><i data-lucide="plus" class="icon-sm"></i> Add Field</button>
+            </header>
+            <div id="addCfForm" class="cf-form card" style="display:none; background:#f8fafc; margin-bottom:16px; padding:16px;">
+              <div style="display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap;">
+                <div class="form-group narrow" style="flex:1; min-width:150px;"><label>Field Name</label><input type="text" id="cfName" class="form-input" placeholder="e.g. GST Number"></div>
+                <div class="form-group narrow" style="width:120px;"><label>Type</label><select id="cfType" class="form-input"><option value="TEXT">Text</option><option value="NUMBER">Number</option><option value="DATE">Date</option><option value="DROPDOWN">Dropdown</option></select></div>
+                <div class="form-group narrow" style="flex:2; min-width:200px;"><label>Options (csv)</label><input type="text" id="cfOptions" class="form-input" placeholder="Comma separated options if dropdown"></div>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn btn-primary" onclick="saveCustomField(this)">Save</button>
+                  <button class="btn btn-secondary" onclick="document.getElementById('addCfForm').style.display='none'">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Options</th><th>Required</th><th>Actions</th></tr></thead><tbody id="customFieldsTable"></tbody></table>
+          </div>
+
+          <div class="card stagger-item" id="tab-profile" style="display:none;">
+            <h3>User Profile</h3>
+            <div id="profileInfo" style="margin-top:16px;"></div>
+          </div>
+
+          <div class="card stagger-item admin-only" id="tab-audit" style="display:none;">
+            <header class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <h3>Audit Trail</h3>
+              <div style="display:flex; gap:8px;">
+                <select id="auditUserFilter" class="form-input narrow" onchange="loadAuditLog()"></select>
+                <select id="auditActionFilter" class="form-input narrow" onchange="loadAuditLog()">
+                  <option value="">All actions</option>
+                  <option value="LEAD_CREATED">Lead created</option>
+                  <option value="LEAD_UPDATED">Lead updated</option>
+                  <option value="LEAD_DELETED">Lead deleted</option>
+                  <option value="FOLLOWUP_LOGGED">Follow-up logged</option>
+                  <option value="QUOTE_CREATED">Quote created</option>
+                  <option value="QUOTE_DELETED">Quote deleted</option>
+                  <option value="DOC_UPLOADED">Document uploaded</option>
+                  <option value="LOGIN">Login</option>
+                </select>
+              </div>
+            </header>
+            <div id="auditTimeline" style="margin-top:16px;"></div>
+            <div id="auditPagination" style="display:flex; justify-content:center; gap:8px; margin-top:16px;"></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-pricecalc-landing">
+          <div class="pricecalc-hero stagger-item">
+            <div class="pricecalc-hero-icon">
+              <i data-lucide="calculator"></i>
+            </div>
+            <div class="pricecalc-hero-text">
+              <h2>Price Calculator</h2>
+              <p>Pricing engine, profit rules, and product lookup tools. Click any tile to open.</p>
+            </div>
+          </div>
+
+          <div class="pricecalc-grid">
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('dashboard')">
+              <div class="pricecalc-card-icon" style="background:#EDE9FE; color:#7C3AED;">
+                <i data-lucide="bar-chart-2"></i>
+              </div>
+              <div class="pricecalc-card-title">Dashboard</div>
+              <div class="pricecalc-card-desc">Overview, metrics, and key product status</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('calculator')">
+              <div class="pricecalc-card-icon" style="background:#DBEAFE; color:#2563EB;">
+                <i data-lucide="search"></i>
+              </div>
+              <div class="pricecalc-card-title">Sales Lookup</div>
+              <div class="pricecalc-card-desc">Quote estimation engine for any SKU</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('slab-view')">
+              <div class="pricecalc-card-icon" style="background:#D1FAE5; color:#059669;">
+                <i data-lucide="trending-up"></i>
+              </div>
+              <div class="pricecalc-card-title">Full Slab View</div>
+              <div class="pricecalc-card-desc">All quantity breaks for a product</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('catalog')">
+              <div class="pricecalc-card-icon" style="background:#FEF3C7; color:#D97706;">
+                <i data-lucide="list"></i>
+              </div>
+              <div class="pricecalc-card-title">Sales Price List</div>
+              <div class="pricecalc-card-desc">Master pricing list, browsable &amp; exportable</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('profit-rules')">
+              <div class="pricecalc-card-icon" style="background:#FCE7F3; color:#DB2777;">
+                <i data-lucide="pie-chart"></i>
+              </div>
+              <div class="pricecalc-card-title">Profit Rules</div>
+              <div class="pricecalc-card-desc">Slab-based margin configurations</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('catalog-guide')">
+              <div class="pricecalc-card-icon" style="background:#E0E7FF; color:#4F46E5;">
+                <i data-lucide="book"></i>
+              </div>
+              <div class="pricecalc-card-title">Catalog Guide</div>
+              <div class="pricecalc-card-desc">PDF references and documentation</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('users')">
+              <div class="pricecalc-card-icon" style="background:#FEE2E2; color:#DC2626;">
+                <i data-lucide="users"></i>
+              </div>
+              <div class="pricecalc-card-title">Users</div>
+              <div class="pricecalc-card-desc">Team directory and role management</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+
+            <div class="pricecalc-card stagger-item" onclick="openPricecalcPage('mousepad-calc')">
+              <div class="pricecalc-card-icon" style="background:#F3F4F6; color:#4B5563;">
+                <i data-lucide="calculator"></i>
+              </div>
+              <div class="pricecalc-card-title">Mousepad Calc</div>
+              <div class="pricecalc-card-desc">Cost-per-piece based on roll yield</div>
+              <div class="pricecalc-card-arrow"><i data-lucide="arrow-right"></i></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-pricecatalog" style="padding:0;">
+          <header class="price-catalog-header" style="display:flex; align-items:center; padding:16px 24px; border-bottom:1px solid var(--border); background:#fff;">
+            <button class="btn btn-secondary" onclick="showPricecalcLanding(null)">
+              <i data-lucide="arrow-left" style="width:16px;"></i> Back to Price Calculator
+            </button>
+            <h2 id="pricecalcPageTitle" style="margin:0 0 0 16px; font-size:18px;">
+              <i data-lucide="tag" style="width:18px; vertical-align:middle;"></i> Price Calculator
+            </h2>
+            <a id="pricecalcExternalLink" href="https://mulyaa.netlify.app/" target="_blank" class="btn btn-secondary" style="margin-left:auto;">
+              <i data-lucide="external-link" style="width:14px;"></i> Open in New Tab
+            </a>
+          </header>
+          <iframe id="priceCatalogFrame" src="about:blank" style="width:100%; height:calc(100vh - 120px); border:none; display:block;"></iframe>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+
+  <aside class="lead-drawer" id="leadDrawer">
+<header class="drawer-header" style="display:flex; justify-content:space-between; padding:20px; border-bottom:1px solid var(--border); background:#f8fafc;">
+      <div>
+        <h2 id="drawName" style="margin:0; font-size:20px;">Name</h2>
+        <div class="drawer-id" id="drawId" style="font-size:12px; color:var(--text-secondary); margin-top:4px;">ID</div>
+      </div>
+<div style="display:flex; gap:8px; align-items:flex-start;">
+        <button class="icon-btn" onclick="editCurrentDrawerLead()" title="Edit lead" style="color:var(--primary);">
+          <i data-lucide="edit-2"></i>
+        </button>
+        <button class="icon-btn" onclick="closeLeadDrawer()" title="Close"><i data-lucide="x"></i></button>
+      </div>
+    </header>
+    
+    <div class="drawer-body" style="padding:20px; overflow-y:auto; height:calc(100vh - 80px);">
+      <div class="drawer-badges" id="drawBadges" style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;"></div>
+      <div id="drawScoreBar" class="drawer-score" style="margin-bottom:20px;"></div>
+      
+<div class="drawer-actions" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px;">
+        <button class="btn btn-secondary call-btn" id="drawBtnCall" style="justify-content:center; border-color:var(--success); color:var(--success);"><i data-lucide="phone"></i> Call</button>
+        <button class="btn btn-primary" id="drawBtnFollow" style="justify-content:center;"><i data-lucide="calendar"></i> Follow Up</button>
+        <button class="btn btn-secondary wa-btn" id="drawBtnWa" style="justify-content:center; border-color:#10B981; color:#10B981;"><i data-lucide="message-circle"></i> WhatsApp</button>
+      </div>
+      
+      <button class="btn" id="btnRepeatOrder" onclick="createRepeatLeadFromDrawer()" style="width:100%; margin-bottom:24px; background:var(--success); color:white; border:none; display:none; justify-content:center; font-weight:600;">
+        <i data-lucide="refresh-cw"></i> Mark as Repeat Order
+      </button>
+      
+<div class="drawer-info-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+        <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Mobile</label><div id="drawMobile" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Email</label><div id="drawEmail" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Company</label><div id="drawCompany" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Expected Value</label><div id="drawValue" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Source</label><div id="drawSource" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Campaign</label><div id="drawCampaign" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Assigned To</label><div id="drawAssigned" style="font-weight:500;"></div></div>
+<div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Created</label><div id="drawCreated" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Next Follow-Up</label><div id="drawNextFollowup" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Product / Requirement</label><div id="drawProduct" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">State</label><div id="drawState" style="font-weight:500;"></div></div>
+          <div><label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Buyer Type</label><div id="drawBuyerType" style="font-weight:500;"></div></div>
+        </div>
+      
+      <h4 class="section-h4" style="display:flex; justify-content:space-between; align-items:center; margin-top:32px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+        <span>Documents <span id="drawDocCount" class="badge badge-new" style="margin-left:8px;">0</span></span>
+        <button class="btn btn-secondary" onclick="openAddDocModal()" style="padding:4px 10px; font-size:11px;">
+          <i data-lucide="plus" style="width:14px;"></i> Add
+        </button>
+      </h4>
+      <div id="drawDocuments"></div>
+      
+      <h4 class="section-h4" style="margin-top:32px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:8px;">History</h4>
+      <div id="drawTimeline"></div>
+      
+      <h4 class="section-h4" style="margin-top:32px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:8px;">Form Responses</h4>
+      <div id="drawFormResponses"></div>
+    </div>
+  </aside>
+
+  <div class="modal-overlay" id="modal-bulkUpload">
+    <div class="modal" style="max-width:600px;">
+      <header class="modal-header">
+        <h3>Bulk Import</h3>
+        <button class="icon-btn" onclick="closeModal('modal-bulkUpload')"><i data-lucide="x"></i></button>
+      </header>
+ <div class="modal-body">
+        <div style="background:var(--primary-light); border:1px solid var(--primary); border-radius:8px; padding:14px; margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+          <i data-lucide="info" style="width:20px; color:var(--primary); flex-shrink:0;"></i>
+          <div style="flex:1; font-size:13px;">
+            <b style="color:var(--primary);">Step 1:</b> Download the template, fill it with your leads, then upload below.
+          </div>
+          <button class="btn btn-primary" onclick="downloadLeadTemplate()" style="flex-shrink:0;">
+            <i data-lucide="download" style="width:14px;"></i> Download Template
+          </button>
+        </div>
+        <label style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; display:block;">Step 2: Upload filled CSV</label>
+        <input type="file" id="csvFileInput" accept=".csv" class="form-input mb-16" onchange="handleFileSelect(event)">
+        <div class="bulk-preview-wrap" style="max-height:300px; overflow:auto;">
+          <table class="data-table compact-table" id="bulkPreviewTable" style="display:none;">
+            <thead id="bulkPreviewHead"></thead>
+            <tbody id="bulkPreviewBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-bulkUpload')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitBulkImport(this)">Import</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-addLead">
+    <div class="modal">
+      <header class="modal-header">
+        <h3>Add New Lead</h3>
+        <button class="icon-btn" onclick="closeModal('modal-addLead')"><i data-lucide="x"></i></button>
+      </header>
+<div class="modal-body">
+        <input type="hidden" id="lParentLeadId">
+        <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+<div class="form-group"><label>Name *</label><input type="text" id="lName" class="form-input"></div>
+          <div class="form-group"><label>Mobile *</label><input type="text" id="lMobile" class="form-input"></div>
+          <div class="form-group">
+            <label>Product / Requirement</label>
+            <select id="lProduct" class="form-input">
+              <option value="">Select product...</option>
+              <option>Sublimation Setup</option>
+              <option>Sublimation Raw Material</option>
+              <option>T-Shirts</option>
+              <option>T-Shirt printing machine</option>
+              <option>Sublimation Mobile Cover</option>
+              <option>Mobile Cover Printing Machine</option>
+              <option>Raw material</option>
+              <option>Heat Press Machine</option>
+              <option>DTF Printer</option>
+              <option>DTF Raw Material</option>
+              <option>Sipper Bottle</option>
+              <option>Photo Frames</option>
+              <option>Cushion Cover</option>
+              <option>UV Machine</option>
+              <option>UV DTF machine</option>
+              <option>UV raw material</option>
+              <option>Tote Bag</option>
+              <option>Laser Marking Machine</option>
+              <option>Sublimation Printer</option>
+              <option>Sublimation Mug</option>
+              <option>Led Frames</option>
+              <option>Led Products</option>
+              <option>Magic Mirror</option>
+              <option>Fridge Magnet Machine</option>
+              <option>Fridge Magnet Raw Material</option>
+              <option>Mouse Pad</option>
+              <option>Keyboard Matt</option>
+              <option>Epson Printer</option>
+              <option>DTF Ink</option>
+              <option>DTF Roll</option>
+              <option>DTF Powder</option>
+              <option>Heat press spare parts</option>
+              <option>DTF Sticker</option>
+              <option>Others</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Buyer Type</label>
+            <select id="lBuyerType" class="form-input">
+              <option value="">Select buyer type...</option>
+              <option>Bulk</option>
+              <option>Retail</option>
+              <option>Reseller</option>
+              <option>Printing job work</option>
+              <option>Bulk Printing</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Email</label><input type="email" id="lEmail" class="form-input"></div>
+          <div class="form-group"><label>Company</label><input type="text" id="lCompany" class="form-input"></div>
+          <div class="form-group"><label>City</label><input type="text" id="lCity" class="form-input"></div>
+          <div class="form-group">
+            <label>State / Location</label>
+            <select id="lState" class="form-input">
+              <option value="">Select state...</option>
+              <option>Delhi</option>
+              <option>Uttar Pradesh</option>
+              <option>Punjab</option>
+              <option>Haryana</option>
+              <option>Uttarakhand</option>
+              <option>Jammu and Kashmir</option>
+              <option>Madhya Pradesh</option>
+              <option>Manipur</option>
+              <option>Mizoram</option>
+              <option>Assam</option>
+              <option>Bihar</option>
+              <option>Jharkhand</option>
+              <option>Odisha</option>
+              <option>Chhattisgarh</option>
+              <option>Karnataka</option>
+              <option>Tamil Nadu</option>
+              <option>Telangana</option>
+              <option>Kerala</option>
+              <option>Gujarat</option>
+              <option>Goa</option>
+              <option>Andhra Pradesh</option>
+              <option>Arunachal Pradesh</option>
+              <option>Chandigarh</option>
+              <option>Ladakh</option>
+              <option>Himachal Pradesh</option>
+              <option>Meghalaya</option>
+              <option>Tripura</option>
+              <option>West Bengal</option>
+              <option>Sikkim</option>
+              <option>Rajasthan</option>
+              <option>Maharashtra</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Source</label>
+            <select id="lSource" class="form-input">
+              <option>WALK_IN</option><option>WEBSITE</option><option>FACEBOOK</option><option>INDIAMART</option>
+              <option>JUSTDIAL</option><option>WHATSAPP</option><option>REFERRAL</option><option>GOOGLE_SHEET</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Pipeline</label><select id="lPipeline" class="form-input"></select></div>
+          <div class="form-group"><label>Campaign</label><input type="text" id="lCampaign" class="form-input"></div>
+          <div class="form-group"><label>Assigned To</label><select id="lAssigned" class="form-input"></select></div>
+          <div class="form-group"><label>Value (₹)</label><input type="number" id="lValue" class="form-input" value="0"></div>
+          <div class="form-group span2" style="grid-column: span 2;">
+            <label>Type</label>
+            <div class="radio-row" style="display:flex; gap:16px;">
+              <label><input type="radio" name="lType" value="HOT"> Hot</label>
+              <label><input type="radio" name="lType" value="WARM"> Warm</label>
+              <label><input type="radio" name="lType" value="COLD" checked> Cold</label>
+            </div>
+          </div>
+          <div class="form-group span2" style="grid-column: span 2;"><label>Notes</label><textarea id="lNotes" class="form-input" rows="2"></textarea></div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-addLead')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveLead(this)">Save</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-editLead">
+    <div class="modal">
+      <header class="modal-header">
+        <h3 id="editLeadTitle">Edit Lead</h3>
+        <button class="icon-btn" onclick="closeModal('modal-editLead')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <input type="hidden" id="eLeadId">
+        <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+ <div class="form-group"><label>Name *</label><input type="text" id="eName" class="form-input"></div>
+          <div class="form-group"><label>Mobile *</label><input type="text" id="eMobile" class="form-input"></div>
+          <div class="form-group">
+            <label>Product / Requirement</label>
+            <select id="eProduct" class="form-input">
+              <option value="">Select product...</option>
+              <option>Sublimation Setup</option>
+              <option>Sublimation Raw Material</option>
+              <option>T-Shirts</option>
+              <option>T-Shirt printing machine</option>
+              <option>Sublimation Mobile Cover</option>
+              <option>Mobile Cover Printing Machine</option>
+              <option>Raw material</option>
+              <option>Heat Press Machine</option>
+              <option>DTF Printer</option>
+              <option>DTF Raw Material</option>
+              <option>Sipper Bottle</option>
+              <option>Photo Frames</option>
+              <option>Cushion Cover</option>
+              <option>UV Machine</option>
+              <option>UV DTF machine</option>
+              <option>UV raw material</option>
+              <option>Tote Bag</option>
+              <option>Laser Marking Machine</option>
+              <option>Sublimation Printer</option>
+              <option>Sublimation Mug</option>
+              <option>Led Frames</option>
+              <option>Led Products</option>
+              <option>Magic Mirror</option>
+              <option>Fridge Magnet Machine</option>
+              <option>Fridge Magnet Raw Material</option>
+              <option>Mouse Pad</option>
+              <option>Keyboard Matt</option>
+              <option>Epson Printer</option>
+              <option>DTF Ink</option>
+              <option>DTF Roll</option>
+              <option>DTF Powder</option>
+              <option>Heat press spare parts</option>
+              <option>DTF Sticker</option>
+              <option>Others</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Buyer Type</label>
+            <select id="eBuyerType" class="form-input">
+              <option value="">Select buyer type...</option>
+              <option>Bulk</option>
+              <option>Retail</option>
+              <option>Reseller</option>
+              <option>Printing job work</option>
+              <option>Bulk Printing</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>State / Location</label>
+            <select id="eState" class="form-input">
+              <option value="">Select state...</option>
+              <option>Delhi</option>
+              <option>Uttar Pradesh</option>
+              <option>Punjab</option>
+              <option>Haryana</option>
+              <option>Uttarakhand</option>
+              <option>Jammu and Kashmir</option>
+              <option>Madhya Pradesh</option>
+              <option>Manipur</option>
+              <option>Mizoram</option>
+              <option>Assam</option>
+              <option>Bihar</option>
+              <option>Jharkhand</option>
+              <option>Odisha</option>
+              <option>Chhattisgarh</option>
+              <option>Karnataka</option>
+              <option>Tamil Nadu</option>
+              <option>Telangana</option>
+              <option>Kerala</option>
+              <option>Gujarat</option>
+              <option>Goa</option>
+              <option>Andhra Pradesh</option>
+              <option>Arunachal Pradesh</option>
+              <option>Chandigarh</option>
+              <option>Ladakh</option>
+              <option>Himachal Pradesh</option>
+              <option>Meghalaya</option>
+              <option>Tripura</option>
+              <option>West Bengal</option>
+              <option>Sikkim</option>
+              <option>Rajasthan</option>
+              <option>Maharashtra</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Email</label><input type="email" id="eEmail" class="form-input"></div>
+          <div class="form-group"><label>Company</label><input type="text" id="eCompany" class="form-input"></div>
+          <div class="form-group"><label>Pipeline</label><select id="ePipeline" class="form-input"></select></div>
+          <div class="form-group">
+            <label>Stage</label>
+            <select id="eStage" class="form-input">
+              <option>NEW</option><option>CONTACTED</option><option>FOLLOW_UP</option><option>DEMO_SCHEDULED</option>
+              <option>DEMO_DONE</option><option>NEGOTIATION</option><option>CONVERTED</option><option>LOST</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="eStatus" class="form-input">
+              <option>OPEN</option><option>WON</option><option>LOST</option>
+            </select>
+          </div>
+<div class="form-group"><label>Assigned To</label><select id="eAssigned" class="form-input"></select></div>
+          <div class="form-group"><label>Expected Value (₹)</label><input type="number" id="eValue" class="form-input" value="0" min="0"></div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-editLead')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEditLead(this)">Update</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-followUp">
+    <div class="modal modal-wide" style="max-width:800px;">
+      <header class="modal-header">
+        <div>
+          <h3 id="fuLeadName" style="margin:0;">Follow Up</h3>
+          <div class="modal-subtitle" id="fuLeadStage" style="font-size:13px; color:var(--text-secondary); margin-top:4px;">Stage: NEW</div>
+        </div>
+        <button class="icon-btn" onclick="closeModal('modal-followUp')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body" style="display:flex; gap:24px;">
+        <div style="flex:1;">
+          <input type="hidden" id="fuLeadId">
+          <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label>Action</label>
+              <select id="fuAction" class="form-input"><option>CALL</option><option>WHATSAPP</option><option>EMAIL</option><option>VISIT</option><option>OTHER</option></select>
+            </div>
+            <div class="form-group">
+              <label>Outcome</label>
+              <select id="fuOutcome" class="form-input"><option>CONNECTED</option><option>NOT_CONNECTED</option><option>BUSY</option><option>NO_ANSWER</option><option>SWITCHED_OFF</option></select>
+            </div>
+            <div class="form-group">
+              <label>New Stage</label>
+              <select id="fuStage" class="form-input"><option>NEW</option><option>CONTACTED</option><option>FOLLOW_UP</option><option>DEMO_SCHEDULED</option><option>DEMO_DONE</option><option>NEGOTIATION</option><option>CONVERTED</option><option>LOST</option></select>
+            </div>
+            <div class="form-group"><label>Next Date</label><input type="date" id="fuNextDate" class="form-input"></div>
+            <div class="form-group span2" style="grid-column:span 2;"><label>Notes</label><textarea id="fuNotes" class="form-input" rows="3"></textarea></div>
+          </div>
+          <div id="fuCampaignQuestionsArea" class="fu-questions-section" style="display:none; margin-top:20px;">
+            <h4 style="margin-bottom:12px;">Campaign Questions</h4>
+            <div id="fuQuestionsGrid" class="form-grid" style="display:grid; grid-template-columns:1fr; gap:12px;"></div>
+          </div>
+        </div>
+        <div class="fu-history-section" style="width:280px; border-left:1px solid var(--border); padding-left:24px;">
+          <h4 style="margin-bottom:16px;">History</h4>
+          <div id="fuHistoryTimeline" class="fu-history-list" style="max-height:400px; overflow-y:auto;"></div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-primary" onclick="saveFollowUp(this)">Log</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-createCampaign">
+    <div class="modal">
+      <header class="modal-header">
+        <h3>Create Campaign</h3>
+        <button class="icon-btn" onclick="closeModal('modal-createCampaign')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+<div class="form-group span2" style="grid-column:span 2;"><label>Name *</label><input type="text" id="cName" class="form-input"></div>
+          <div class="form-group"><label>Pipeline *</label><select id="cPipeline" class="form-input"></select></div>
+          <div class="form-group"><label>Manager</label><select id="cManager" class="form-input"></select></div>
+          <div class="form-group"><label>Distribution</label><select id="cDist" class="form-input"><option>MANUAL</option><option>EQUAL</option><option>ROUND_ROBIN</option></select></div>
+          <div class="form-group">
+            <label>Retry Max</label>
+            <input type="number" id="cRetryMax" class="form-input" placeholder="default">
+          </div>
+          <div class="form-group">
+            <label>Retry Interval (hrs)</label>
+            <input type="number" id="cRetryInterval" class="form-input" placeholder="default">
+          </div>
+          <div class="form-group span2" style="grid-column:span 2;">
+            <label>Assigned Agents (tick all that apply)</label>
+            <div id="cAgentsCheckboxes" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:8px; padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; max-height:200px; overflow-y:auto;">
+              <div style="color:var(--text-secondary); font-size:12px;">Loading agents...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-createCampaign')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCampaign(this)">Create</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-createWorkflow">
+    <div class="modal" style="max-width:500px;">
+      <header class="modal-header">
+        <h3>Create Workflow</h3>
+        <button class="icon-btn" onclick="closeModal('modal-createWorkflow')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <div class="wf-flow" style="display:flex; flex-direction:column; gap:16px;">
+          <div class="wf-node"><label>1. Name</label><input type="text" id="wfName" class="form-input"></div>
+          <div class="wf-line" style="height:20px; border-left:2px dashed var(--border); margin-left:16px;"></div>
+          <div class="wf-node">
+            <label>2. Event</label>
+            <select id="wfEvent" class="form-input">
+              <option value="LEAD_CREATED">Lead Created</option><option value="STAGE_CHANGED">Stage Changed</option>
+              <option value="NOT_CONTACTED_3DAYS">Not Contacted 3 Days</option><option value="FOLLOWUP_OVERDUE">Overdue</option>
+              <option value="LEAD_CONVERTED">Converted</option>
+            </select>
+          </div>
+          <div class="wf-line" style="height:20px; border-left:2px dashed var(--border); margin-left:16px;"></div>
+          <div class="wf-node"><label>3. Campaign</label><select id="wfCampaign" class="form-input"><option value="ALL">All</option></select></div>
+          <div class="wf-line" style="height:20px; border-left:2px dashed var(--border); margin-left:16px;"></div>
+          <div class="wf-node">
+            <label>4. Action</label>
+            <select id="wfAction" class="form-input" onchange="updateWfTemplateField(this.value)">
+              <option value="SEND_WHATSAPP">WhatsApp</option><option value="CHANGE_STAGE">Change Stage</option>
+              <option value="REASSIGN_AGENT">Reassign</option><option value="ADD_TAG">Add Tag</option>
+            </select>
+          </div>
+          <div class="wf-line" style="height:20px; border-left:2px dashed var(--border); margin-left:16px;"></div>
+          <div class="wf-node"><label>5. Value</label><div id="wfTemplateArea"><textarea id="wfTemplateText" class="form-input" rows="2"></textarea></div></div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-createWorkflow')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveWorkflow(this)">Create</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-quote">
+    <div class="modal modal-wide" style="max-width:900px;">
+      <header class="modal-header">
+        <div>
+          <h3 id="quoteModalTitle" style="margin:0;">New Quotation</h3>
+          <div class="modal-subtitle" id="quoteIdDisplay" style="font-size:13px; color:var(--text-secondary); margin-top:4px;">QT-YYMMDD-XXX</div>
+        </div>
+        <button class="icon-btn" onclick="closeModal('modal-quote')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <input type="hidden" id="qEditId">
+        <div class="form-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px;">
+          <div class="form-group"><label>Customer Name *</label><input type="text" id="qName" class="form-input"></div>
+          <div class="form-group"><label>Mobile *</label><input type="text" id="qMobile" class="form-input"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="qEmail" class="form-input"></div>
+          <div class="form-group"><label>Company</label><input type="text" id="qCompany" class="form-input"></div>
+          <div class="form-group"><label>Link to Lead</label><select id="qLeadId" class="form-input"><option value="">None</option></select></div>
+          <div class="form-group"><label>Valid Until</label><input type="date" id="qValidUntil" class="form-input"></div>
+        </div>
+        
+        <div class="quote-items-section card" style="padding:16px; background:#f8fafc; margin-bottom:24px;">
+          <header class="card-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="font-size:14px; margin:0;">Line Items</h4>
+            <button class="btn btn-secondary" onclick="addQuoteLineItem()" style="padding:4px 10px; font-size:11px;">
+              <i data-lucide="plus" style="width:14px;"></i> Add Item
+            </button>
+          </header>
+          <table class="data-table compact-table" id="quoteItemsTable">
+            <thead>
+              <tr>
+                <th>Item Name</th><th style="width:60px;">Qty</th><th style="width:70px;">Unit</th>
+                <th style="width:80px;">Rate</th><th style="width:60px;">Disc %</th>
+                <th style="width:90px;">Amount</th><th style="width:40px;"></th>
+              </tr>
+            </thead>
+            <tbody id="quoteItemsBody"></tbody>
+          </table>
+        </div>
+        
+        <div class="quote-summary" style="display:flex; justify-content:space-between; gap:32px;">
+          <div class="form-group" style="flex:1; margin-top:12px;">
+            <label>Notes / Terms</label>
+            <textarea id="qNotes" class="form-input" rows="4" placeholder="Delivery terms, payment terms..."></textarea>
+          </div>
+          <div class="quote-totals" style="width:300px; background:#f8fafc; padding:16px; border-radius:8px;">
+            <div class="quote-total-row" style="display:flex; justify-content:space-between; margin-bottom:12px;">
+              <span>Subtotal</span><span id="qSubtotal" style="font-weight:600;">₹0</span>
+            </div>
+            <div class="quote-total-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span>Discount</span><input type="number" id="qDiscount" class="form-input narrower" value="0" oninput="calculateQuoteTotals()" style="width:80px; text-align:right;">
+            </div>
+            <div class="quote-total-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span>GST %</span><input type="number" id="qGstPercent" class="form-input narrower" value="18" oninput="calculateQuoteTotals()" style="width:80px; text-align:right;">
+            </div>
+            <div class="quote-total-row" style="display:flex; justify-content:space-between; margin-bottom:12px;">
+              <span>GST Amount</span><span id="qGstAmount">₹0</span>
+            </div>
+            <div class="quote-total-row quote-grand-total" style="display:flex; justify-content:space-between; margin-top:16px; padding-top:16px; border-top:2px solid var(--border); font-size:18px; font-weight:700;">
+              <span>Grand Total</span><span id="qGrandTotal">₹0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-quote')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveQuote(this)"><i data-lucide="save" class="icon-sm"></i> Save Quote</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-addDoc">
+    <div class="modal" style="max-width:500px;">
+      <header class="modal-header">
+        <h3>Add Document</h3>
+        <button class="icon-btn" onclick="closeModal('modal-addDoc')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <nav class="doc-type-tabs" style="display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid var(--border);">
+          <button class="doc-type-tab active" onclick="switchDocType('link', this)" style="padding:10px 16px; background:none; border:none; border-bottom:2px solid var(--primary); color:var(--primary); font-weight:600;"><i data-lucide="link" style="width:14px;"></i> Paste Link</button>
+          <button class="doc-type-tab" onclick="switchDocType('upload', this)" style="padding:10px 16px; background:none; border:none; border-bottom:2px solid transparent;"><i data-lucide="upload-cloud" style="width:14px;"></i> Upload File</button>
+        </nav>
+        <div class="form-group mb-16"><label>Document Name *</label><input type="text" id="docName" class="form-input" placeholder="e.g. Logo v1, Mockup Final"></div>
+        <div class="form-group mb-16">
+          <label>Category</label>
+          <select id="docCategory" class="form-input">
+            <option value="LOGO">Logo</option>
+            <option value="MOCKUP" selected>Mockup / Proof</option>
+            <option value="PO">Purchase Order</option>
+            <option value="INVOICE">Invoice</option>
+            <option value="DESIGN">Design File</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div id="docLinkSection" class="form-group mb-16">
+          <label>Google Drive URL *</label>
+          <input type="url" id="docUrl" class="form-input" placeholder="https://drive.google.com/...">
+          <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Make sure the link is "Anyone with link can view"</div>
+        </div>
+        <div id="docUploadSection" class="form-group mb-16" style="display:none;">
+          <label>Select File *</label>
+          <input type="file" id="docFile" class="form-input" accept="image/*,.heic,.heif,.webp,.avif,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+          <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Max 25MB. Images (JPG, PNG, HEIC, WEBP), PDF, Word, Excel, PowerPoint accepted.</div>
+          <div id="docUploadPreview" style="margin-top:8px;"></div>
+        </div>
+        <div class="form-group"><label>Notes</label><textarea id="docNotes" class="form-input" rows="2"></textarea></div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-addDoc')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveLeadDocument(this)">Add Document</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-viewArticle">
+    <div class="modal modal-wide" style="max-width:800px;">
+      <header class="modal-header">
+        <div>
+          <h3 id="viewArticleTitle" style="margin:0;">Article Title</h3>
+          <div class="modal-subtitle" id="viewArticleMeta" style="font-size:13px; color:var(--text-secondary); margin-top:4px;">Category | Date</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="icon-btn admin-only" onclick="openEditArticleModal(currentKbArticleId)"><i data-lucide="edit"></i></button>
+          <button class="icon-btn admin-only" style="color:var(--danger);" onclick="confirmDeleteArticle(currentKbArticleId)"><i data-lucide="trash-2"></i></button>
+          <button class="icon-btn" onclick="closeModal('modal-viewArticle')"><i data-lucide="x"></i></button>
+        </div>
+      </header>
+      <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+        <div id="viewArticleTags" style="margin-bottom: 16px;"></div>
+        <div id="viewArticleContent" style="white-space: pre-wrap; font-size: 14px; line-height: 1.6;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-editArticle">
+    <div class="modal modal-wide" style="max-width:800px;">
+      <header class="modal-header">
+        <h3 id="editArticleModalTitle">New Article</h3>
+        <button class="icon-btn" onclick="closeModal('modal-editArticle')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <input type="hidden" id="editArticleId">
+        <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="form-group span2" style="grid-column:span 2;"><label>Title *</label><input type="text" id="editArticleTitle" class="form-input"></div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="editArticleCategory" class="form-input">
+              <option value="PRODUCT">Product</option><option value="OBJECTION">Objection</option>
+              <option value="SCRIPT">Script</option><option value="SOP">SOP</option><option value="FAQ">FAQ</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Tags (comma separated)</label><input type="text" id="editArticleTags" class="form-input"></div>
+          <div class="form-group span2" style="grid-column:span 2;"><label>Content *</label><textarea id="editArticleContent" class="form-input" rows="12"></textarea></div>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-editArticle')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveArticle(this)">Save Article</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-bulkReassign">
+    <div class="modal" style="max-width:450px;">
+      <header class="modal-header">
+        <h3>Reassign Leads</h3>
+        <button class="icon-btn" onclick="closeModal('modal-bulkReassign')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <p style="margin-bottom:16px;">Reassign <b id="bulkReassignCount">0</b> selected leads to:</p>
+        <div class="form-group">
+          <label>New Agent</label>
+          <select id="bulkReassignAgent" class="form-input"></select>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-bulkReassign')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmBulkReassign(this)">Reassign</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-bulkTag">
+    <div class="modal" style="max-width:450px;">
+      <header class="modal-header">
+        <h3>Add Tag</h3>
+        <button class="icon-btn" onclick="closeModal('modal-bulkTag')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <p style="margin-bottom:16px;">Add tag to <b id="bulkTagCount">0</b> selected leads:</p>
+        <div class="form-group">
+          <label>Tag Name</label>
+          <input type="text" id="bulkTagName" class="form-input" placeholder="e.g. Q4-2026, Hot, Followup">
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-top:8px;">This tag will be appended to existing tags (no duplicates).</p>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-bulkTag')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmBulkAddTag(this)">Add Tag</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-bulkStage">
+    <div class="modal" style="max-width:450px;">
+      <header class="modal-header">
+        <h3>Change Stage</h3>
+        <button class="icon-btn" onclick="closeModal('modal-bulkStage')"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <p style="margin-bottom:16px;">Change stage for <b id="bulkStageCount">0</b> selected leads to:</p>
+        <div class="form-group">
+          <label>New Stage</label>
+          <select id="bulkNewStage" class="form-input"></select>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-bulkStage')">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmBulkChangeStage(this)">Update Stage</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-postCall">
+    <div class="modal" style="max-width:420px;">
+      <header class="modal-header">
+        <h3>Did you talk to customer?</h3>
+        <button class="icon-btn" onclick="skipPostCallLog()"><i data-lucide="x"></i></button>
+      </header>
+      <div class="modal-body">
+        <div style="text-align:center; padding:20px 0;">
+          <div style="width:64px; height:64px; background:#DBEAFE; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+            <i data-lucide="phone" style="width:28px; height:28px; color:#3B82F6;"></i>
+          </div>
+          <h3 id="pcmLeadName" style="margin:0 0 8px;">Customer Name</h3>
+          <div style="color:var(--text-secondary); font-size:14px;">
+            <span id="pcmLeadMobile">mobile</span><br>
+            <span style="font-size:12px;">Call duration: <span id="pcmDuration">0 seconds</span></span>
+          </div>
+        </div>
+        
+        <div style="display:flex; gap:12px; margin-top:16px;">
+          <button class="btn btn-secondary" style="flex:1; padding:14px; font-size:14px; border:2px solid var(--danger); color:var(--danger);" onclick="handleCallReturn(false)">
+            <i data-lucide="phone-off" style="width:16px;"></i> Not Connected
+          </button>
+          <button class="btn btn-primary" style="flex:1; padding:14px; font-size:14px; background:var(--success); border-color:var(--success);" onclick="handleCallReturn(true)">
+            <i data-lucide="phone-call" style="width:16px;"></i> Yes, Talked
+          </button>
+        </div>
+        
+        <button class="btn" style="width:100%; margin-top:12px; padding:10px; font-size:12px; color:var(--text-secondary); background:transparent; border:none;" onclick="skipPostCallLog()">
+          Skip logging
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
+  <div id="toast" class="toast">
+    <i data-lucide="check-circle" style="display:none;" class="toast-icon"></i>
+    <span class="toast-msg">Action Successful</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="config.js"></script>
+<script src="api.js"></script>
+<script src="ui.js"></script>     <script src="leads.js"></script>
+<script src="features.js"></script>
+<script src="settings.js"></script>
+<script src="main.js"></script>
+  </body> </html>

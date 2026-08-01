@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MakeMyClicks CRM — Sign In</title>
+  
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Your Config -->
+  <script src="config.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans (display) + Inter alternative for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --brand: #6D28D9;
+      --brand-dark: #5B21B6;
+      --brand-light: #EDE9FE;
+      --ink: #0F172A;
+      --ink-soft: #475569;
+      --ink-muted: #94A3B8;
+      --line: #E2E8F0;
+      --bg: #FFFFFF;
+      --bg-soft: #F8FAFC;
+      --success: #059669;
+      --success-bg: #D1FAE5;
+      --danger: #DC2626;
+      --danger-bg: #FEE2E2;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 20px 40px rgba(109, 40, 217, 0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .display-font {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* ──────── LAYOUT ──────── */
+    .shell {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      min-height: 100vh;
+    }
+
+    /* ──────── LEFT PANEL — BRAND/ILLUSTRATION ──────── */
+    .left-panel {
+      position: relative;
+      background: linear-gradient(135deg, #6D28D9 0%, #4C1D95 60%, #312E81 100%);
+      color: white;
+      padding: 56px 64px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Decorative blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .blob-1 { width: 400px; height: 400px; background: #A78BFA; top: -100px; right: -100px; animation: float1 12s ease-in-out infinite; }
+    .blob-2 { width: 300px; height: 300px; background: #F472B6; bottom: -80px; left: -60px; animation: float2 14s ease-in-out infinite; }
+    .blob-3 { width: 200px; height: 200px; background: #60A5FA; top: 40%; left: 20%; animation: float1 10s ease-in-out infinite reverse; }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -30px) scale(1.1); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    /* Subtle grid overlay */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .left-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: auto;
+    }
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      backdrop-filter: blur(10px);
+    }
+    .brand-logo span {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+
+    .pitch {
+      max-width: 480px;
+      margin: 60px 0;
+    }
+    .pitch-eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      margin-bottom: 28px;
+    }
+    .pitch h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+    .pitch h2 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #FBBF24 0%, #F472B6 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .pitch p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.75);
+      max-width: 420px;
+    }
+
+    /* Feature list */
+    .features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: auto;
+    }
+    .features li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .check-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .check-dot svg { width: 12px; height: 12px; stroke-width: 3; }
+
+    /* Trust bar */
+    .trust {
+      margin-top: 48px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .trust-stars { color: #FBBF24; letter-spacing: 1px; }
+
+    /* ──────── RIGHT PANEL — FORM ──────── */
+    .right-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: var(--bg);
+    }
+    .form-wrap {
+      width: 100%;
+      max-width: 420px;
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-header { margin-bottom: 36px; }
+    .form-header h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+    .form-header p {
+      font-size: 15px;
+      color: var(--ink-soft);
+    }
+
+    .alert {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      margin-bottom: 18px;
+      align-items: center;
+      gap: 10px;
+      animation: shake 0.4s ease-out;
+    }
+    .alert.show { display: flex; }
+    .alert.error {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #FCA5A5;
+    }
+    .alert.success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid #6EE7B7;
+      animation: none;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 7px;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--ink-muted);
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+    input[type="email"], input[type="password"], input[type="text"] {
+      width: 100%;
+      padding: 13px 14px 13px 44px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-family: inherit;
+      color: var(--ink);
+      background: var(--bg);
+      transition: all 0.18s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.1);
+    }
+    input:focus + svg, .input-wrap:focus-within svg {
+      color: var(--brand);
+    }
+
+    .toggle-pwd {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--ink-muted);
+      padding: 6px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      transition: color 0.2s;
+    }
+    .toggle-pwd:hover { color: var(--brand); }
+    .toggle-pwd svg { width: 18px; height: 18px; }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      font-size: 13.5px;
+    }
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      user-select: none;
+    }
+    .remember input { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
+    .forgot {
+      color: var(--brand);
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .forgot:hover { color: var(--brand-dark); }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+    }
+    .btn-submit:hover {
+      background: var(--brand-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(109, 40, 217, 0.35);
+    }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-submit svg { width: 16px; height: 16px; }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .form-footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .form-footer a {
+      color: var(--brand);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    /* ──────── RESPONSIVE ──────── */
+    @media (max-width: 960px) {
+      .shell { grid-template-columns: 1fr; }
+      .left-panel {
+        padding: 32px;
+        min-height: 240px;
+      }
+      .pitch { margin: 24px 0; }
+      .pitch h2 { font-size: 30px; }
+      .features { display: none; }
+      .trust { margin-top: 24px; }
+      .right-panel { padding: 32px 24px; }
+    }
+    @media (max-width: 480px) {
+      .left-panel { padding: 24px; min-height: 200px; }
+      .pitch h2 { font-size: 24px; }
+      .pitch p { font-size: 14px; }
+      .pitch-eyebrow { margin-bottom: 16px; }
+      .form-header h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <!-- ════════ LEFT — BRAND ════════ -->
+    <aside class="left-panel">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+
+      <div class="left-content">
+        <div class="brand-mark">
+          <div class="brand-logo"><span>M</span></div>
+          <div class="brand-name">MakeMyClicks</div>
+        </div>
+
+        <div class="pitch">
+          <span class="pitch-eyebrow">Sales CRM</span>
+          <h2>Close more deals with <em>focused</em> follow-ups.</h2>
+          <p>Track every lead, every call, every conversion — built for India's growing sales teams.</p>
+        </div>
+
+        <ul class="features">
+          <li>
+            <span class="check-dot"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Pipeline kanban with drag-and-drop stages
+          </li>
+          <li>
+            <span class="check-dot"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg></span>
+            WhatsApp & call tracking, built-in
+          </li>
+          <li>
+            <span class="check-dot"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Real-time campaign analytics
+          </li>
+        </ul>
+
+        <div class="trust">
+          <span class="trust-stars">★★★★★</span>
+          <span>Trusted by the MMC sales team</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ════════ RIGHT — FORM ════════ -->
+    <main class="right-panel">
+      <div class="form-wrap">
+        <header class="form-header">
+          <h1>Welcome back</h1>
+          <p>Sign in to continue to your dashboard.</p>
+        </header>
+
+        <div id="errorMsg" class="alert error"></div>
+        <div id="successMsg" class="alert success"></div>
+
+        <form id="loginForm" novalidate>
+          <div class="field">
+            <label for="email">Work email</label>
+            <div class="input-wrap">
+              <input type="email" id="email" placeholder="you@makemyclicks.com" required autocomplete="email">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <button type="button" class="toggle-pwd" id="togglePwd" aria-label="Show password">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eyeIcon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="remember">
+              <input type="checkbox" id="remember">
+              <span>Keep me signed in</span>
+            </label>
+            <a href="#" class="forgot" onclick="handleForgotPassword(event)">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="loginBtn">
+            <span id="btnText">Sign in</span>
+            <svg id="btnArrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          Need an account? <a href="#">Contact your admin</a>
+          <div style="margin-top:14px; font-size:11.5px; color:var(--ink-muted);">© MakeMyClicks 2026 · v2.0</div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+<script>
+  var supabaseClient = supabase.createClient(
+    window.MMC_CONFIG.SUPABASE_URL,
+    window.MMC_CONFIG.SUPABASE_ANON_KEY
+  );
+
+// Already logged in? Redirect.
+  (async function checkExistingSession() {
+    var { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+      window.location.href = 'index.html';
+    }
+  })();
+
+  // Forgot password handler
+  async function handleForgotPassword(e) {
+    e.preventDefault();
+    var email = prompt('Enter your work email to receive a password reset link:');
+    if (!email) return;
+    email = email.trim().toLowerCase();
+    if (email.indexOf('@') === -1) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    var redirectUrl = window.location.origin + '/reset-password.html';
+    var { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl
+    });
+    if (error) {
+      alert('Error: ' + error.message);
+    } else {
+      alert('Password reset link sent to ' + email + '. Check your inbox (and spam folder).');
+    }
+  }
+
+  // Password show/hide
+  document.getElementById('togglePwd').addEventListener('click', function() {
+    var pwd = document.getElementById('password');
+    var eye = document.getElementById('eyeIcon');
+    if (pwd.type === 'password') {
+      pwd.type = 'text';
+      eye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      pwd.type = 'password';
+      eye.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  });
+
+  // Form submit
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var btn = document.getElementById('loginBtn');
+    var btnText = document.getElementById('btnText');
+    var btnArrow = document.getElementById('btnArrow');
+    var errorMsg = document.getElementById('errorMsg');
+    var successMsg = document.getElementById('successMsg');
+
+    errorMsg.classList.remove('show');
+    successMsg.classList.remove('show');
+    btn.disabled = true;
+    btnText.textContent = 'Signing in';
+    btnArrow.outerHTML = '<span class="spinner" id="btnArrow"></span>';
+
+    try {
+      var { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+      if (error) throw error;
+
+      var { data: userDetails, error: userError } = await supabaseClient
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (userError || !userDetails) {
+        throw new Error('User profile not found. Contact admin.');
+      }
+
+      // SECURITY: Do NOT cache role/permissions client-side. checkAuth() in api.js
+      // refetches role fresh from the users table on every page load.
+      sessionStorage.setItem('mmc_user_name', userDetails.name);
+
+      successMsg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Welcome back, ' + userDetails.name + '!';
+      successMsg.classList.add('show');
+
+      setTimeout(function() {
+        window.location.href = 'index.html';
+      }, 700);
+
+    } catch (err) {
+      errorMsg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' + (err.message || 'Login failed. Check credentials.');
+      errorMsg.classList.add('show');
+      btn.disabled = false;
+      btnText.textContent = 'Sign in';
+      var newArrow = document.createElement('span');
+      newArrow.outerHTML = '<svg id="btnArrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+      document.getElementById('btnArrow').outerHTML = newArrow.outerHTML;
+    }
+  });
+</script>
+</body>
+</html>
