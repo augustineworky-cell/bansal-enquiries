@@ -1476,3 +1476,84 @@ th[data-column-key] {
   margin-left: 16px;
 }
 .nav-group.open .nav-group-body { display: flex; }
+
+/* ============================================================
+   DISPATCH DESIGN SYSTEM ALIGNMENT
+   Ported from the DISPATCH app so both products read as one
+   system. Tokens are additive — existing CRM variables are
+   untouched, so nothing that already worked changes behaviour.
+   ============================================================ */
+:root {
+  /* Radius scale */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* Extended shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-xl: 0 24px 48px -12px rgba(0,0,0,0.20);
+  --shadow-brand: 0 4px 18px rgba(79,70,229,0.45);
+
+  /* Timing */
+  --duration-instant: 75ms;
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index scale */
+  --z-sticky: 10;
+  --z-dropdown: 50;
+  --z-overlay: 99;
+  --z-drawer: 10000;
+  --z-modal: 99999;
+  --z-toast: 999999;
+
+  /* Borders */
+  --border-subtle: #f1f5f9;
+  --border-strong: #d1d5db;
+}
+
+/* ── Scrollbars (DISPATCH) ───────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ── Dark gradient sidebar (DISPATCH) ────────────────────── */
+.sidebar {
+  background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+  border-right: none;
+}
+.sidebar .logo-text { color: #ffffff; }
+.sidebar .logo-box {
+  background: var(--primary);
+  box-shadow: var(--shadow-brand);
+}
+.sidebar .nav-item { color: #cbd5e1; }
+.sidebar .nav-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: #ffffff;
+}
+.sidebar .nav-item.active {
+  background: rgba(255,255,255,0.10);
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 #f97316;
+}
+.sidebar-bottom { border-top: 1px solid rgba(255,255,255,0.10); }
+.nav-group-body { border-left-color: rgba(255,255,255,0.14); }
+
+/* ── Card hover lift (DISPATCH) ──────────────────────────── */
+.card-hover {
+  transition: transform var(--duration-base) var(--ease-default),
+              box-shadow var(--duration-base) var(--ease-default),
+              border-color var(--duration-base) var(--ease-default);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
+  border-color: var(--border-strong);
+}
