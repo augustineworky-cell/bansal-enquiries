@@ -518,7 +518,7 @@ function exportContacts() {
 // ──────────────────────────────────────────────────────────
 function resetAddLeadForm() {
   // Text inputs
-var textFields = ['lName', 'lMobile', 'lCompany', 'lCity', 'lCampaign', 'lNotes'];
+var textFields = ['lName', 'lMobile', 'lProduct', 'lCompany', 'lCity', 'lCampaign', 'lNotes'];
   textFields.forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
@@ -528,7 +528,7 @@ var textFields = ['lName', 'lMobile', 'lCompany', 'lCity', 'lCampaign', 'lNotes'
   var valueEl = document.getElementById('lValue');
   if (valueEl) valueEl.value = '0';
   // Reset dropdowns to first option
-  var dropdowns = ['lProduct', 'lBuyerType', 'lState', 'lSource', 'lPipeline', 'lAssigned'];
+  var dropdowns = ['lBuyerType', 'lState', 'lSource', 'lPipeline', 'lAssigned'];
   dropdowns.forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.selectedIndex = 0;

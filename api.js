@@ -198,10 +198,20 @@ lead_type: params.leadData.leadType,
           last_contacted: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
-        if (params.data.stageAfter === 'CONVERTED' || params.data.stageAfter === 'WON') leadUpdates.status = 'WON';
+        var isConversion = (params.data.stageAfter === 'CONVERTED' || params.data.stageAfter === 'WON');
+        if (isConversion) leadUpdates.status = 'WON';
         if (params.data.stageAfter === 'LOST') leadUpdates.status = 'LOST';
         var { error: lUpErr } = await supabaseClient.from('leads').update(leadUpdates).eq('lead_id', params.data.leadId);
         if (lUpErr) throw lUpErr;
+
+        // On conversion, push the lead into the DISPATCH app's enquiries table.
+        // Runs after the CRM update has already succeeded, so a DISPATCH
+        // outage can never block or roll back a conversion in this app.
+        if (isConversion) {
+          try { await pushLeadToDispatch(params.data.leadId); }
+          catch (dispErr) { console.error('DISPATCH push failed:', dispErr); }
+        }
+
         responseData = { success: true };
         break;
 
@@ -1103,3 +1113,67 @@ case 'uploadLeadDocument':
     else if (typeof showToast === 'function') showToast(err.message, 'error');
   }
 }
+
+// ============================================================
+// DISPATCH INTEGRATION
+// Pushes a converted lead into the DISPATCH app's `enquiries`
+// table via the `push-to-dispatch` Edge Function.
+//
+// The Edge Function holds DISPATCH's service_role key server-side;
+// it is never exposed to the browser. A direct browser insert is
+// impossible because DISPATCH's RLS resolves org via its own
+// users table, which BIKREE users do not exist in.
+// ============================================================
+async function pushLeadToDispatch(leadId) {
+  // Load the lead
+  var { data: lead, error: readErr } = await supabaseClient
+    .from('leads').select('*').eq('lead_id', leadId).single();
+  if (readErr) throw readErr;
+  if (!lead) throw new Error('Lead not found: ' + leadId);
+
+  // Already pushed -> don't create a duplicate enquiry
+  if (lead.dispatch_enquiry_id) {
+    console.log('Lead already pushed to DISPATCH:', lead.dispatch_enquiry_id);
+    return { skipped: true, enquiryId: lead.dispatch_enquiry_id };
+  }
+
+  var payload = {
+    customer_name: lead.contact_name,
+    customer_phone: lead.mobile,
+    city: lead.city,
+    product_interest: lead.product_interest,
+    source: lead.lead_source || 'CRM',
+    notes: lead.notes
+  };
+
+  try {
+    var { data: fnData, error: fnErr } = await supabaseClient
+      .functions.invoke('push-to-dispatch', { body: payload });
+
+    if (fnErr) throw fnErr;
+    if (!fnData || !fnData.success) {
+      throw new Error((fnData && fnData.error) ? fnData.error : 'Unknown DISPATCH error');
+    }
+
+    await supabaseClient.from('leads').update({
+      dispatch_enquiry_id: fnData.enquiry ? fnData.enquiry.id : null,
+      dispatch_pushed_at: new Date().toISOString(),
+      dispatch_push_error: null
+    }).eq('lead_id', leadId);
+
+    if (typeof showToast === 'function') showToast('Sent to Dispatch', 'success');
+    return { success: true, enquiry: fnData.enquiry };
+
+  } catch (err) {
+    // Record the failure so it is visible/retryable rather than silent
+    await supabaseClient.from('leads').update({
+      dispatch_push_error: String(err.message || err).slice(0, 500)
+    }).eq('lead_id', leadId);
+
+    if (typeof showToast === 'function') {
+      showToast('Lead converted, but Dispatch sync failed', 'warning');
+    }
+    throw err;
+  }
+}
+window.pushLeadToDispatch = pushLeadToDispatch;
