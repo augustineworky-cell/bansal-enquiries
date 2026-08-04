@@ -1523,25 +1523,26 @@ th[data-column-key] {
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* ── Dark gradient sidebar (DISPATCH) ────────────────────── */
+/* ── Purple gradient sidebar (matches login page) ────────── */
 .sidebar {
-  background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+  background: linear-gradient(180deg, #6D28D9 0%, #4C1D95 60%, #312E81 100%);
   border-right: none;
 }
 .sidebar .logo-text { color: #ffffff; }
 .sidebar .logo-box {
-  background: var(--primary);
-  box-shadow: var(--shadow-brand);
+  background: rgba(255,255,255,0.16);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
 }
-.sidebar .nav-item { color: #cbd5e1; }
+.sidebar .nav-item { color: #DDD6FE; }
 .sidebar .nav-item:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.10);
   color: #ffffff;
 }
 .sidebar .nav-item.active {
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.16);
   color: #ffffff;
-  box-shadow: inset 3px 0 0 #f97316;
+  box-shadow: inset 3px 0 0 #FBBF24;
 }
 .sidebar-bottom { border-top: 1px solid rgba(255,255,255,0.10); }
 .nav-group-body { border-left-color: rgba(255,255,255,0.14); }
@@ -1556,4 +1557,12 @@ th[data-column-key] {
   transform: translateY(-2px);
   box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
   border-color: var(--border-strong);
+}
+
+/* Logout link: inline style sets a dark red that reads poorly on the
+   purple sidebar. !important is required to beat the inline style. */
+.sidebar .nav-item[onclick*="logout"] { color: #FCA5A5 !important; }
+.sidebar .nav-item[onclick*="logout"]:hover {
+  color: #FFFFFF !important;
+  background: rgba(239,68,68,0.25);
 }

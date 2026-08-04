@@ -424,8 +424,74 @@ lead_type: params.leadData.leadType,
           mappedOrders.push({ orderId: String(row.order_id), customerName: row.customer_name || 'Unknown', salesPerson: row.sales_person || '', phone: row.phone || '', typeOfOrder: row.type_of_order || '', timestamp: row.timestamp || '', steps: steps, doneSteps: doneSteps, overallStatus: overallStatus, RAW_DATA: upperRow });
         });
         responseData = { success: true, orders: mappedOrders, metrics: oMetrics };
+
+        // ── Converted leads shown as orders ──────────────────
+        // The CRM's `orders` table is currently unused; orders live in
+        // the DISPATCH app. Until the two are joined, a lead converted
+        // here is surfaced on this page so it does not disappear.
+        try {
+          let convQuery = supabaseClient.from('leads')
+            .select('*')
+            .or('status.eq.WON,stage.eq.CONVERTED')
+            .order('updated_at', { ascending: false });
+          if (params.userRole === 'AGENT' && params.userName) {
+            convQuery = convQuery.eq('assigned_to', params.userName);
+          }
+          var { data: convLeads, error: convErr } = await convQuery;
+          if (convErr) throw convErr;
+
+          // Don't duplicate anything already present in the orders table
+          var existingIds = {};
+          mappedOrders.forEach(function(o) { existingIds[String(o.orderId)] = true; });
+
+          (convLeads || []).forEach(function(l) {
+            if (!l.lead_id || existingIds[String(l.lead_id)]) return;
+
+            var lSteps = [];
+            for (var i = 1; i <= 7; i++) {
+              // Step 1 is complete: the lead was converted inside the CRM.
+              // Remaining steps are owned by DISPATCH and unknown here.
+              var isFirst = (i === 1);
+              lSteps.push({
+                num: i,
+                name: stepNames[i-1],
+                status: isFirst ? 'Converted in CRM' : '',
+                delay: '',
+                planned: '',
+                actual: isFirst ? (l.updated_at || '') : '',
+                state: isFirst ? 'done' : 'pending'
+              });
+            }
+
+            oMetrics.total++;
+            oMetrics.active++;
+
+            var upperLead = {};
+            Object.keys(l).forEach(function(k) { upperLead[k.toUpperCase()] = l[k]; });
+
+            mappedOrders.push({
+              orderId: String(l.lead_id),
+              customerName: l.contact_name || 'Unknown',
+              salesPerson: l.assigned_to || '',
+              phone: l.mobile || '',
+              typeOfOrder: l.product_interest || '',
+              timestamp: l.updated_at || l.lead_date || '',
+              steps: lSteps,
+              doneSteps: 1,
+              overallStatus: 'active',
+              fromLead: true,
+              dispatchEnquiryId: l.dispatch_enquiry_id || null,
+              RAW_DATA: upperLead
+            });
+          });
+
+          responseData = { success: true, orders: mappedOrders, metrics: oMetrics };
+        } catch (convCatchErr) {
+          // Converted-lead lookup must never break the Orders page
+          console.error('Converted-lead fetch failed:', convCatchErr);
+        }
         break;
-        
+
       case 'getFormResponses':
         try {
           var { data: fData, error: fErr } = await supabaseClient.from('form_responses').select('*').eq('lead_id', params.leadId);
