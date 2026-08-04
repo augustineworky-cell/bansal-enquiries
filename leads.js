@@ -518,7 +518,7 @@ function exportContacts() {
 // ──────────────────────────────────────────────────────────
 function resetAddLeadForm() {
   // Text inputs
-var textFields = ['lName', 'lMobile', 'lEmail', 'lCompany', 'lCity', 'lCampaign', 'lNotes'];
+var textFields = ['lName', 'lMobile', 'lCompany', 'lCity', 'lCampaign', 'lNotes'];
   textFields.forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
@@ -562,7 +562,7 @@ function saveLead(btn) {
   const data = { 
     contactName: document.getElementById('lName').value, 
     mobile: document.getElementById('lMobile').value, 
-    email: document.getElementById('lEmail').value, 
+    email: '', 
     company: document.getElementById('lCompany').value, 
     city: document.getElementById('lCity').value, 
     state: document.getElementById('lState').value, 
@@ -1615,7 +1615,6 @@ function createRepeatLeadFromDrawer() {
       // Pre-fill all contact info
       document.getElementById('lName').value = lead.CONTACT_NAME || '';
       document.getElementById('lMobile').value = lead.MOBILE || '';
-      document.getElementById('lEmail').value = lead.EMAIL || '';
       document.getElementById('lCompany').value = lead.COMPANY || '';
       document.getElementById('lCity').value = lead.CITY || '';
       document.getElementById('lState').value = lead.STATE || '';

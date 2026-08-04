@@ -1459,3 +1459,20 @@ th[data-column-key] {
   width: 18px;
   height: 18px;
 }
+/* ── Collapsible sidebar group (Future Upgrades) ───────────── */
+.nav-group { display: flex; flex-direction: column; }
+.nav-group-toggle { cursor: pointer; justify-content: flex-start; }
+.nav-group-chevron {
+  margin-left: auto;
+  width: 16px; height: 16px;
+  transition: transform .2s ease;
+}
+.nav-group.open .nav-group-chevron { transform: rotate(180deg); }
+.nav-group-body {
+  display: none;
+  flex-direction: column;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255,255,255,.12);
+  margin-left: 16px;
+}
+.nav-group.open .nav-group-body { display: flex; }

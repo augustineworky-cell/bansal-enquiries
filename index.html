@@ -45,24 +45,32 @@
         <a href="#" class="nav-item" data-page="quotations" onclick="showPage('quotations', this)">
           <i data-lucide="file-text"></i> Quotations
         </a>
-        <a href="#" class="nav-item" data-page="pipeline" onclick="showPage('pipeline', this)">
-          <i data-lucide="git-branch"></i> Pipeline
-        </a>
-        <a href="#" class="nav-item nav-admin" data-page="campaigns" onclick="showPage('campaigns', this)">
-          <i data-lucide="megaphone"></i> Campaigns
-        </a>
-        <a href="#" class="nav-item" data-page="pricecalc" onclick="showPricecalcLanding(this)">
-          <i data-lucide="calculator"></i> Price Calculator
-        </a>
-        <a href="#" class="nav-item" data-page="knowledge" onclick="showPage('knowledge', this)">
-          <i data-lucide="book-open"></i> Knowledge Base
-        </a>
-        <a href="#" class="nav-item nav-admin" data-page="reports" onclick="showPage('reports', this)">
-          <i data-lucide="bar-chart-2"></i> Reports
-        </a>
-        <a href="#" class="nav-item" data-page="leaderboard" onclick="showPage('leaderboard', this)">
-          <i data-lucide="trophy"></i> Leaderboard
-        </a>
+        <div class="nav-group" id="futureUpgradeGroup">
+          <a href="#" class="nav-item nav-group-toggle" id="futureUpgradeToggle" onclick="toggleNavGroup(event)">
+            <i data-lucide="layers"></i> Future Upgrades
+            <i data-lucide="chevron-down" class="nav-group-chevron"></i>
+          </a>
+          <div class="nav-group-body" id="futureUpgradeBody">
+            <a href="#" class="nav-item" data-page="pipeline" onclick="showPage('pipeline', this)">
+              <i data-lucide="git-branch"></i> Pipeline
+            </a>
+            <a href="#" class="nav-item nav-admin" data-page="campaigns" onclick="showPage('campaigns', this)">
+              <i data-lucide="megaphone"></i> Campaigns
+            </a>
+            <a href="#" class="nav-item" data-page="pricecalc" onclick="showPricecalcLanding(this)">
+              <i data-lucide="calculator"></i> Price Calculator
+            </a>
+            <a href="#" class="nav-item" data-page="knowledge" onclick="showPage('knowledge', this)">
+              <i data-lucide="book-open"></i> Knowledge Base
+            </a>
+            <a href="#" class="nav-item nav-admin" data-page="reports" onclick="showPage('reports', this)">
+              <i data-lucide="bar-chart-2"></i> Reports
+            </a>
+            <a href="#" class="nav-item" data-page="leaderboard" onclick="showPage('leaderboard', this)">
+              <i data-lucide="trophy"></i> Leaderboard
+            </a>
+          </div>
+        </div>
       </nav>
       
       <footer class="sidebar-bottom" id="settingsNavItem">
@@ -939,46 +947,15 @@
 <div class="modal-body">
         <input type="hidden" id="lParentLeadId">
         <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-<div class="form-group"><label>Name *</label><input type="text" id="lName" class="form-input"></div>
+<div class="form-group"><label>Company / Person Name *</label><input type="text" id="lName" class="form-input"></div>
           <div class="form-group"><label>Mobile *</label><input type="text" id="lMobile" class="form-input"></div>
           <div class="form-group">
             <label>Product / Requirement</label>
             <select id="lProduct" class="form-input">
               <option value="">Select product...</option>
-              <option>Sublimation Setup</option>
-              <option>Sublimation Raw Material</option>
-              <option>T-Shirts</option>
-              <option>T-Shirt printing machine</option>
-              <option>Sublimation Mobile Cover</option>
-              <option>Mobile Cover Printing Machine</option>
-              <option>Raw material</option>
-              <option>Heat Press Machine</option>
-              <option>DTF Printer</option>
-              <option>DTF Raw Material</option>
-              <option>Sipper Bottle</option>
-              <option>Photo Frames</option>
-              <option>Cushion Cover</option>
-              <option>UV Machine</option>
-              <option>UV DTF machine</option>
-              <option>UV raw material</option>
-              <option>Tote Bag</option>
-              <option>Laser Marking Machine</option>
-              <option>Sublimation Printer</option>
-              <option>Sublimation Mug</option>
-              <option>Led Frames</option>
-              <option>Led Products</option>
-              <option>Magic Mirror</option>
-              <option>Fridge Magnet Machine</option>
-              <option>Fridge Magnet Raw Material</option>
-              <option>Mouse Pad</option>
-              <option>Keyboard Matt</option>
-              <option>Epson Printer</option>
-              <option>DTF Ink</option>
-              <option>DTF Roll</option>
-              <option>DTF Powder</option>
-              <option>Heat press spare parts</option>
-              <option>DTF Sticker</option>
-              <option>Others</option>
+              <option>Printing</option>
+              <option>Job Work</option>
+              <option>Bulk Printing</option>
             </select>
           </div>
           <div class="form-group">
@@ -988,12 +965,9 @@
               <option>Bulk</option>
               <option>Retail</option>
               <option>Reseller</option>
-              <option>Printing job work</option>
-              <option>Bulk Printing</option>
               <option>Other</option>
             </select>
           </div>
-          <div class="form-group"><label>Email</label><input type="email" id="lEmail" class="form-input"></div>
           <div class="form-group"><label>Company</label><input type="text" id="lCompany" class="form-input"></div>
           <div class="form-group"><label>City</label><input type="text" id="lCity" class="form-input"></div>
           <div class="form-group">
@@ -1120,8 +1094,6 @@
               <option>Bulk</option>
               <option>Retail</option>
               <option>Reseller</option>
-              <option>Printing job work</option>
-              <option>Bulk Printing</option>
               <option>Other</option>
             </select>
           </div>

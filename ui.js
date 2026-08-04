@@ -291,3 +291,14 @@ function exportToCSV(rows, filename) {
   
   showToast('Exported ' + rows.length + ' rows', 'success');
 }
+// ── Collapsible sidebar group toggle ────────────────────────
+function toggleNavGroup(e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  var group = document.getElementById('futureUpgradeGroup');
+  if (!group) return;
+  group.classList.toggle('open');
+  try {
+    if (window.lucide && lucide.createIcons) lucide.createIcons();
+  } catch (err) {}
+}
+window.toggleNavGroup = toggleNavGroup;
