@@ -1644,3 +1644,69 @@ html.dark .sidebar {
 }
 .theme-toggle-btn:hover { background: var(--surface); color: var(--primary); }
 .theme-toggle-btn i { width: 18px; height: 18px; }
+
+/* ============================================================
+   AURORA — ambient background
+   Pure CSS: no canvas, no requestAnimationFrame loop. Browsers
+   run these on the compositor and throttle them automatically
+   in background tabs, so it costs far less than a JS particle
+   system and never touches the main thread.
+   ============================================================ */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.28;
+  will-change: transform;
+}
+.aurora-blob.a {
+  width: 46vw; height: 46vw;
+  background: #A78BFA;
+  left: -10vw; top: -14vw;
+  animation: auroraA 26s ease-in-out infinite;
+}
+.aurora-blob.b {
+  width: 38vw; height: 38vw;
+  background: #F472B6;
+  right: -8vw; bottom: -12vw;
+  animation: auroraB 34s ease-in-out infinite;
+}
+.aurora-blob.c {
+  width: 32vw; height: 32vw;
+  background: #6366F1;
+  left: 45%; top: 30%;
+  animation: auroraC 30s ease-in-out infinite;
+}
+@keyframes auroraA { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(12vw,7vh) scale(1.12); } }
+@keyframes auroraB { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-10vw,-6vh) scale(1.08); } }
+@keyframes auroraC { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-8vw,9vh) scale(0.9); } }
+
+/* Content must paint above the aurora */
+.main-content { background: transparent; position: relative; z-index: 1; }
+
+/* Dark mode: dimmer, or it glows through the dark surface */
+html.dark .aurora-blob { opacity: 0.20; }
+html.dark .aurora-blob.a { background: #7C3AED; }
+html.dark .aurora-blob.b { background: #BE185D; }
+html.dark .aurora-blob.c { background: #4338CA; }
+
+/* Motion sensitivity: hold the blobs still rather than removing
+   them, so the look survives but the movement stops. */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob { animation: none !important; }
+}
+
+/* Conversion celebration canvas */
+#celebrate-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 999998;
+  pointer-events: none;
+}

@@ -208,6 +208,9 @@ lead_type: params.leadData.leadType,
         // Runs after the CRM update has already succeeded, so a DISPATCH
         // outage can never block or roll back a conversion in this app.
         if (isConversion) {
+          if (typeof window.celebrateConversion === 'function') {
+            try { window.celebrateConversion(); } catch (e) {}
+          }
           try { await pushLeadToDispatch(params.data.leadId); }
           catch (dispErr) { console.error('DISPATCH push failed:', dispErr); }
         }
