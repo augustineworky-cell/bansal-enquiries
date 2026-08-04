@@ -102,8 +102,32 @@ lead_type: params.leadData.leadType,
         var updates = {};
         Object.keys(params.updates).forEach(key => { updates[key.toLowerCase()] = params.updates[key]; });
         updates.updated_at = new Date().toISOString();
+
+        // Read the current state first so we only celebrate a lead that is
+        // newly converted — re-saving an already-WON lead must not re-fire.
+        var wasAlreadyWon = false;
+        try {
+          var { data: prevLead } = await supabaseClient
+            .from('leads').select('status, stage').eq('lead_id', params.leadId).single();
+          if (prevLead) {
+            wasAlreadyWon = (prevLead.status === 'WON' || prevLead.stage === 'CONVERTED');
+          }
+        } catch (prevErr) { /* non-fatal: fall through and just update */ }
+
         var { error: upErr } = await supabaseClient.from('leads').update(updates).eq('lead_id', params.leadId);
         if (upErr) throw upErr;
+
+        // The Edit Lead modal can set status to WON directly, bypassing the
+        // follow-up flow. Treat that as a conversion too.
+        var nowWon = (updates.status === 'WON' || updates.stage === 'CONVERTED');
+        if (nowWon && !wasAlreadyWon) {
+          if (typeof window.celebrateConversion === 'function') {
+            try { window.celebrateConversion(); } catch (e) {}
+          }
+          try { await pushLeadToDispatch(params.leadId); }
+          catch (dispErr) { console.error('DISPATCH push failed:', dispErr); }
+        }
+
         responseData = { success: true };
         break;
 
