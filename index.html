@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    // Applied before first paint so there's no light-mode flash on load.
+    // Shares the 'bmh_theme' key with the DISPATCH app.
+    (function () {
+      try {
+        var saved = localStorage.getItem('bmh_theme');
+        var wantsDark = saved
+          ? saved === 'dark'
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (wantsDark) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bansal Material House CRM</title>
@@ -116,6 +130,10 @@
           </div>
           <button id="breakBtn" class="btn btn-secondary break-btn" onclick="toggleBreak()">
             <div class="status-dot status-dot-danger"></div> Take Break
+          </button>
+          <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()"
+                  title="Toggle light / dark mode" aria-label="Toggle light / dark mode">
+            <i data-lucide="moon"></i>
           </button>
           <button class="icon-btn" onclick="toggleNotifications()">
             <i data-lucide="bell"></i>

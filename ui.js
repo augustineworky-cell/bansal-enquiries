@@ -302,3 +302,37 @@ function toggleNavGroup(e) {
   } catch (err) {}
 }
 window.toggleNavGroup = toggleNavGroup;
+
+// ── Light / dark theme ──────────────────────────────────────
+// index.html applies the saved/system theme before first paint;
+// this handles the runtime toggle, persistence and icon swap.
+// The 'bmh_theme' key is shared with the DISPATCH app so both
+// products follow the same preference on the same browser.
+function isDarkMode() {
+  return document.documentElement.classList.contains('dark');
+}
+
+function syncThemeIcon() {
+  var btn = document.getElementById('themeToggleBtn');
+  if (!btn) return;
+  btn.innerHTML = '<i data-lucide="' + (isDarkMode() ? 'sun' : 'moon') + '"></i>';
+  try { if (window.lucide && lucide.createIcons) lucide.createIcons(); } catch (e) {}
+}
+
+function toggleTheme() {
+  var next = !isDarkMode();
+  document.documentElement.classList.toggle('dark', next);
+  try { localStorage.setItem('bmh_theme', next ? 'dark' : 'light'); } catch (e) {}
+  syncThemeIcon();
+}
+
+// Set the correct icon once the DOM (and lucide) are ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', syncThemeIcon);
+} else {
+  syncThemeIcon();
+}
+
+window.isDarkMode = isDarkMode;
+window.toggleTheme = toggleTheme;
+window.syncThemeIcon = syncThemeIcon;

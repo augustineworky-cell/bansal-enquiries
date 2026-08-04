@@ -981,7 +981,7 @@ th[data-column-key] {
 .column-filter-dropdown {
   position: absolute;
   z-index: 9999;
-  background: #fff;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
@@ -1049,7 +1049,7 @@ th[data-column-key] {
 
 .column-filter-search:focus {
   border-color: var(--primary);
-  background: #fff;
+  background: var(--bg);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
 }
 
@@ -1145,7 +1145,7 @@ th[data-column-key] {
 }
 
 .column-filter-item:hover .column-filter-item-count {
-  background: #fff;
+  background: var(--bg);
 }
 
 .column-filter-empty {
@@ -1167,7 +1167,7 @@ th[data-column-key] {
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--bg);
   color: var(--text);
   font-size: 12px;
   font-weight: 600;
@@ -1378,7 +1378,7 @@ th[data-column-key] {
 
 .pricecalc-card {
   position: relative;
-  background: #fff;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 20px;
@@ -1566,3 +1566,81 @@ th[data-column-key] {
   color: #FFFFFF !important;
   background: rgba(239,68,68,0.25);
 }
+
+/* ============================================================
+   DARK MODE
+   Implemented by overriding the CSS custom properties on
+   html.dark. Because ~317 colour usages already go through
+   these variables, the whole app re-themes from this block.
+   The theme class is applied in <head> before first paint to
+   avoid a white flash on load.
+   ============================================================ */
+html.dark {
+  --bg: #0F172A;
+  --surface: #1E293B;
+  --border: #334155;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --primary-light: #312E81;
+
+  --success-bg: #064E3B;
+  --warning-bg: #451A03;
+  --danger-bg: #450A0A;
+  --info-bg: #172554;
+
+  --border-subtle: #1E293B;
+  --border-strong: #475569;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.40);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.50), 0 2px 4px -2px rgb(0 0 0 / 0.40);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.55), 0 4px 6px -4px rgb(0 0 0 / 0.45);
+}
+
+html.dark body { background: var(--surface); color: var(--text); }
+
+/* Scrollbars need inverting or they glow bright on dark */
+html.dark ::-webkit-scrollbar-thumb { background: #475569; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #64748B; }
+
+/* Form controls: browsers don't inherit theme into native inputs */
+html.dark .form-input,
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder { color: var(--text-secondary); }
+
+/* Native dropdown lists render with OS colours unless told otherwise */
+html.dark select option { background: var(--bg); color: var(--text); }
+
+/* Leaderboard podium gradients are hardcoded light */
+html.dark .lb-rank-1 { background: linear-gradient(180deg, #422006 0%, var(--bg) 100%); }
+html.dark .lb-rank-2 { background: linear-gradient(180deg, #1E293B 0%, var(--bg) 100%); }
+html.dark .lb-rank-3 { background: linear-gradient(180deg, #431407 0%, var(--bg) 100%); }
+
+/* Sidebar keeps its purple identity in both themes, but deepens */
+html.dark .sidebar {
+  background: linear-gradient(180deg, #4C1D95 0%, #312E81 60%, #1E1B4B 100%);
+}
+
+/* Theme toggle button */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-default),
+              color var(--duration-fast) var(--ease-default);
+}
+.theme-toggle-btn:hover { background: var(--surface); color: var(--primary); }
+.theme-toggle-btn i { width: 18px; height: 18px; }
