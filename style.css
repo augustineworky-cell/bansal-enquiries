@@ -1710,3 +1710,69 @@ html.dark .aurora-blob.c { background: #4338CA; }
   z-index: 999998;
   pointer-events: none;
 }
+
+/* ============================================================
+   COLLECTIONS MODULE
+   ============================================================ */
+#page-collections { padding: 20px 24px; overflow-y: auto; }
+
+.cl-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.cl-kpi { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+.cl-kpi span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); margin-bottom: 6px; }
+.cl-kpi b { font-size: 20px; font-weight: 700; color: var(--text); }
+.cl-kpi-total { border-color: var(--primary); }
+.cl-kpi-total b { color: var(--primary); }
+.cl-kpi-warn { border-color: var(--warning); }
+.cl-kpi-warn b { color: var(--warning); }
+.cl-kpi-bad { border-color: var(--danger); }
+.cl-kpi-bad b { color: var(--danger); }
+
+.cl-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.cl-tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 4px; }
+.cl-tab { border: none; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: var(--radius-sm); cursor: pointer; }
+.cl-tab:hover { color: var(--text); }
+.cl-tab.active { background: var(--bg); color: var(--primary); box-shadow: var(--shadow-xs); }
+
+.cl-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); }
+.cl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cl-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); font-weight: 600; padding: 11px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; background: var(--surface); position: sticky; top: 0; }
+.cl-table td { padding: 11px 12px; border-bottom: 1px solid var(--border-subtle); color: var(--text); white-space: nowrap; }
+.cl-table tr:last-child td { border-bottom: none; }
+.cl-table .r { text-align: right; }
+.cl-table tbody tr:hover { background: var(--surface); }
+.cl-row-warn { background: rgba(245, 158, 11, 0.07); }
+
+.cl-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: var(--radius-full); white-space: nowrap; }
+.cl-ok { background: var(--success-bg); color: var(--success); }
+.cl-a  { background: var(--info-bg); color: var(--info); }
+.cl-b  { background: var(--warning-bg); color: var(--warning); }
+.cl-c  { background: #FFEDD5; color: #C2410C; }
+.cl-d  { background: var(--danger-bg); color: var(--danger); }
+html.dark .cl-c { background: #431407; color: #FB923C; }
+
+.cl-flag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: var(--radius-full); background: var(--danger-bg); color: var(--danger); margin-left: 6px; }
+
+.cl-mini { font-family: inherit; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; }
+.cl-mini:hover { border-color: var(--primary); color: var(--primary); }
+.cl-mini-warn { border-color: var(--danger); color: var(--danger); }
+.cl-mini-warn:hover { background: var(--danger); color: #fff; }
+
+.cl-empty { padding: 44px 20px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+
+/* Modal */
+.cl-modal-wrap { position: fixed; inset: 0; z-index: 99999; background: rgba(15,23,42,.55); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.cl-modal { background: var(--bg); border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); width: 100%; max-width: 560px; max-height: 88vh; display: flex; flex-direction: column; }
+.cl-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+.cl-modal-head h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--text); }
+.cl-x { border: none; background: transparent; font-size: 24px; line-height: 1; color: var(--text-secondary); cursor: pointer; }
+.cl-modal-body { padding: 20px 22px; overflow-y: auto; }
+.cl-modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--border); }
+.cl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.cl-grid label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+.cl-grid .cl-full { grid-column: 1 / -1; }
+.cl-note { margin: 14px 0 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.cl-recv { background: var(--surface); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; }
+.cl-recv span { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
+.cl-recv b { font-size: 20px; color: var(--text); }
+
+@media (max-width: 640px) { .cl-grid { grid-template-columns: 1fr; } }

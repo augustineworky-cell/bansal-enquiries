@@ -64,6 +64,9 @@
         <a href="#" class="nav-item" data-page="quotations" onclick="showPage('quotations', this)">
           <i data-lucide="file-text"></i> Quotations
         </a>
+        <a href="#" class="nav-item nav-admin" data-page="collections" onclick="showPage('collections', this)">
+          <i data-lucide="indian-rupee"></i> Collections
+        </a>
         <div class="nav-group" id="futureUpgradeGroup">
           <a href="#" class="nav-item nav-group-toggle" id="futureUpgradeToggle" onclick="toggleNavGroup(event)">
             <i data-lucide="layers"></i> Future Upgrades
@@ -425,6 +428,10 @@
             </div>
           </div>
           <div class="card stagger-item" id="calendarGrid"></div>
+        </section>
+
+        <section id="page-collections" class="page">
+          <div id="clBody"></div>
         </section>
 
         <section id="page-orders" class="page">
@@ -1529,6 +1536,7 @@
 <script src="ui.js"></script>     <script src="leads.js"></script>
 <script src="features.js"></script>
 <script src="settings.js"></script>
+<script src="collections.js"></script>
 <script src="celebrate.js"></script>
 <script src="main.js"></script>
   </body> </html>

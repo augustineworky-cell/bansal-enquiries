@@ -101,7 +101,7 @@ const showPage = (pageId, navElement) => {
     dashboard: 'Dashboard', contacts: 'Contacts', mytasks: 'My Tasks', 
     calendar: 'Calendar', orders: 'Orders', quotations: 'Quotations', 
     pipeline: 'Pipeline', campaigns: 'Campaigns', knowledge: 'Knowledge Base', 
-    reports: 'Reports', leaderboard: 'Leaderboard', settings: 'Settings' 
+    reports: 'Reports', leaderboard: 'Leaderboard', settings: 'Settings', collections: 'Collections' 
   };
   
   const titleEl = document.getElementById('pageTitle');
@@ -123,6 +123,7 @@ const showPage = (pageId, navElement) => {
     case 'mytasks': if (typeof loadMyTasks === 'function') loadMyTasks(); break;
     case 'calendar': if (typeof loadCalendar === 'function') loadCalendar(); break;
     case 'orders': if (typeof loadOrders === 'function') loadOrders(); break;
+    case 'collections': if (typeof loadCollections === 'function') loadCollections(); break;
     case 'quotations': if (typeof loadQuotations === 'function') loadQuotations(); break;
     case 'pipeline': if (typeof loadPipeline === 'function') loadPipeline(); break;
     case 'campaigns': if (typeof loadCampaigns === 'function') loadCampaigns(); break;
@@ -229,6 +230,7 @@ const refreshCurrentPage = () => {
     case 'mytasks': if (typeof loadMyTasks === 'function') loadMyTasks(); break;
     case 'calendar': if (typeof loadCalendar === 'function') loadCalendar(); break;
     case 'orders': if (typeof loadOrders === 'function') loadOrders(); break;
+    case 'collections': if (typeof loadCollections === 'function') loadCollections(); break;
     case 'pipeline': if (typeof loadPipeline === 'function') loadPipeline(); break;
     case 'quotations': if (typeof loadQuotations === 'function') loadQuotations(); break;
   }
