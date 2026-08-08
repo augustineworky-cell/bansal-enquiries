@@ -1788,5 +1788,5 @@ html.dark .cl-c { background: #431407; color: #FB923C; }
   width: 100%;
   height: calc(100vh - 64px);
   border: none;
-  background: #EDEFE7;
+  background: var(--surface);
 }
