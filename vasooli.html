@@ -308,6 +308,7 @@
         </form>
       </div>
     </section>
+    <section id="sec-fms" class="view-section" style="display:none;"><div id="fms-container"></div></section>
     <section id="sec-queue" class="view-section" style="display:none;"><div id="queue-container"></div></section>
     <section id="sec-forecast" class="view-section" style="display:none;"><div id="forecast-container"></div></section>
     <section id="sec-import" class="view-section" style="display:none;"><div id="import-container"></div></section>
@@ -351,7 +352,7 @@
     function setupNavigation() {
       const nav = document.getElementById('app-nav'); nav.innerHTML = ''; nav.style.display = 'flex';
       const role = currentProfile.role, tabs = [];
-      if (role === 'owner' || role === 'caller') { tabs.push({ id: 'queue', label: 'Aaj ki List', section: 'sec-queue' }, { id: 'forecast', label: 'Paisa Forecast', section: 'sec-forecast' }); }
+      if (role === 'owner' || role === 'caller') { tabs.push({ id: 'fms', label: 'Aaj Ka Kaam', section: 'sec-fms' }, { id: 'queue', label: 'Saari Call List', section: 'sec-queue' }, { id: 'forecast', label: 'Paisa Forecast', section: 'sec-forecast' }); }
       if (role === 'owner' || role === 'accountant') { tabs.push({ id: 'import', label: 'Tally Import', section: 'sec-import' }); }
       if (role === 'owner' || role === 'caller') { tabs.push({ id: 'parties', label: 'Saari Party', section: 'sec-parties' }); }
       if (role === 'owner') { tabs.push({ id: 'report', label: 'Report', section: 'sec-report' }); }
@@ -365,7 +366,7 @@
     function switchTab(tabId, sectionId) {
       activeTab = tabId; document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.tabId === tabId));
       showView(sectionId);
-      if (tabId === 'queue') loadCallQueue(); if (tabId === 'forecast') loadForecast();
+      if (tabId === 'fms') loadFMS(); if (tabId === 'queue') loadCallQueue(); if (tabId === 'forecast') loadForecast();
       if (tabId === 'import') renderImportScreen(); if (tabId === 'parties') loadParties(); if (tabId === 'report') loadReport();
     }
 
@@ -388,6 +389,174 @@
     });
     document.getElementById('btn-logout').addEventListener('click', async () => await supabase.auth.signOut());
     function showLoginError(msg) { const errDiv = document.getElementById('login-error'); if (errDiv) errDiv.textContent = msg; }
+
+    // ---------------- FMS: AAJ KA KAAM ----------------
+    // Tasks come from v_fms_tasks — generated from the data, never
+    // created by hand. A task disappears once the underlying reason
+    // is gone (promise settled, follow-up logged, balance cleared).
+    async function loadFMS() {
+      const container = document.getElementById('fms-container');
+      container.innerHTML = '<div class="loading-state">Aaj ka kaam load ho raha hai...</div>';
+      try {
+        const { data: tasks, error } = await supabase.from('v_fms_tasks').select('*')
+          .order('priority', { ascending: true })
+          .order('current_balance', { ascending: false });
+        if (error) throw error;
+
+        if (!tasks || tasks.length === 0) {
+          container.innerHTML = `<div class="empty-state"><h3>Aaj ka kaam khatam!</h3><p>Koi vaada due nahi, koi follow-up pending nahi.</p></div>`;
+          return;
+        }
+
+        const overdue = tasks.filter(t => t.priority === 1).length;
+        const dueToday = tasks.filter(t => t.priority === 2).length;
+        const followUp = tasks.filter(t => t.priority === 3).length;
+        const never = tasks.filter(t => t.priority >= 4).length;
+        const totalDue = tasks.reduce((a, t) => a + Number(t.promised_total || 0), 0);
+
+        let html = `<div class="card" style="border-top:3px solid var(--primary);">
+          <div style="font-size:13px; font-weight:700; margin-bottom:10px;">Aaj Ka Kaam &mdash; ${tasks.length} party</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; font-size:12px;">
+            <div><div style="color:var(--text-secondary);">Vaada overdue</div><div class="amount" style="font-size:17px; color:var(--danger);">${overdue}</div></div>
+            <div><div style="color:var(--text-secondary);">Aaj due</div><div class="amount" style="font-size:17px; color:var(--warning);">${dueToday}</div></div>
+            <div><div style="color:var(--text-secondary);">Follow-up</div><div class="amount" style="font-size:17px; color:var(--info);">${followUp}</div></div>
+            <div><div style="color:var(--text-secondary);">Naya / purana</div><div class="amount" style="font-size:17px;">${never}</div></div>
+            <div><div style="color:var(--text-secondary);">Vaada amount</div><div class="amount" style="font-size:17px;">${formatMoney(totalDue)}</div></div>
+          </div></div>`;
+        container.innerHTML = html;
+        tasks.forEach(t => container.appendChild(createTaskCard(t)));
+      } catch (err) {
+        container.innerHTML = `<div class="error-text">FMS load failed: ${err.message}</div>`;
+      }
+    }
+
+    function createTaskCard(t) {
+      const card = document.createElement('div');
+      card.className = `card card-p${Math.min(t.priority || 5, 5)}`;
+      const totalProm = (t.kept || 0) + (t.broke || 0);
+      const reasonClass = t.priority === 1 ? 'tag-danger' : t.priority === 2 ? 'tag-warning' : 'tag-reason';
+
+      card.innerHTML = `
+        <div class="card-header task-head" style="cursor:pointer;">
+          <div>
+            <div class="party-title">${t.display_name}</div>
+            <div class="party-city">${t.city || 'No City'} &bull; <span class="num">${t.phone || 'NO PHONE'}</span></div>
+          </div>
+          <div><div class="balance-big amount">${formatMoney(t.current_balance)}</div></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;">
+          <div style="display:flex; gap:5px; flex-wrap:wrap;">
+            <span class="tag ${reasonClass}">${t.task_reason}</span>
+            <span class="tag">vaada ${t.kept || 0}/${totalProm}</span>
+            ${t.days_since_call != null ? `<span class="tag">${t.days_since_call}d se baat nahi</span>` : ''}
+          </div>
+          <div class="badges">
+            ${t.on_hold ? '<span class="tag tag-danger">HOLD</span>' : ''}
+            ${t.has_dispute ? '<span class="tag tag-warning">DISPUTE</span>' : ''}
+          </div>
+        </div>
+        ${t.promised_total ? `<div style="margin-top:8px; font-size:12px; background:var(--surface); padding:8px 10px; border-radius:var(--radius-md);">
+          Vaada: <span class="amount">${formatMoney(t.promised_total)}</span> &middot; due ${formatDate(t.earliest_due)}
+        </div>` : ''}
+        <div class="expandable task-body"></div>`;
+
+      const body = card.querySelector('.task-body');
+      card.querySelector('.task-head').onclick = () => {
+        if (!body.classList.contains('open')) renderTaskActions(t, body);
+        body.classList.toggle('open');
+      };
+      return card;
+    }
+
+    async function renderTaskActions(t, box) {
+      box.innerHTML = `
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <a href="tel:${t.phone || ''}" class="btn btn-call">Call</a>
+          <a href="https://wa.me/91${(t.phone||'').replace(/\D/g,'')}" target="_blank" rel="noopener" class="btn btn-wa">WhatsApp</a>
+        </div>
+        <div class="open-proms"><div class="loading-state" style="padding:12px;">Vaade load ho rahe hain...</div></div>`;
+
+      const promBox = box.querySelector('.open-proms');
+      try {
+        const { data: proms, error } = await supabase.from('promises')
+          .select('*').eq('party_id', t.party_id).eq('status', 'open')
+          .order('due_on', { ascending: true });
+        if (error) throw error;
+
+        if (!proms || proms.length === 0) {
+          promBox.innerHTML = `<div style="font-size:12px; color:var(--text-secondary); padding:8px 0;">Koi khula vaada nahi. Call karke "Saari Call List" tab se naya vaada daalein.</div>`;
+          return;
+        }
+
+        promBox.innerHTML = proms.map(pr => {
+          const late = pr.due_on < getTodayISO();
+          return `<div class="prom-row" data-id="${pr.id}" data-total="${pr.total_amount || 0}"
+                    style="background:var(--surface); padding:10px; border-radius:var(--radius-md); margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+              <div style="font-size:12px;">
+                <span class="amount" style="font-size:15px;">${formatMoney(pr.total_amount)}</span>
+                <span style="color:var(--text-secondary);"> due ${formatDate(pr.due_on)}</span>
+                ${late ? '<span class="tag tag-danger" style="margin-left:6px;">LATE</span>' : ''}
+              </div>
+              <div style="font-size:11px; color:var(--text-secondary);">
+                cash ${formatMoney(pr.cash_amount)} / online ${formatMoney(pr.online_amount)}
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr auto; gap:8px; margin-top:10px; align-items:end;">
+              <div class="form-group" style="margin:0;">
+                <label>Kitna aaya (&#8377;)</label>
+                <input type="number" class="settle-amt" value="${pr.total_amount || 0}" min="0" inputmode="decimal">
+              </div>
+            </div>
+            <div class="btn-grid" style="grid-template-columns:1fr 1fr 1fr;">
+              <button class="btn btn-sm btn-kept" style="background:var(--success); color:#fff; border-color:var(--success);">Pura Mila</button>
+              <button class="btn btn-sm btn-partial" style="background:var(--warning); color:#fff; border-color:var(--warning);">Thoda Mila</button>
+              <button class="btn btn-sm btn-broken" style="background:var(--danger); color:#fff; border-color:var(--danger);">Nahi Mila</button>
+            </div>
+            <div class="settle-err error-text"></div>
+          </div>`;
+        }).join('');
+
+        promBox.querySelectorAll('.prom-row').forEach(row => {
+          const id = row.dataset.id;
+          const amtEl = row.querySelector('.settle-amt');
+          const errEl = row.querySelector('.settle-err');
+          const go = (status) => settlePromise(id, status, amtEl, errEl, row);
+          row.querySelector('.btn-kept').onclick    = () => go('kept');
+          row.querySelector('.btn-partial').onclick = () => go('partial');
+          row.querySelector('.btn-broken').onclick  = () => go('broken');
+        });
+      } catch (err) {
+        promBox.innerHTML = `<div class="error-text">Vaade load nahi hue: ${err.message}</div>`;
+      }
+    }
+
+    // Settlement closes the promise AND logs the follow-up AND sets the
+    // next date, all inside one database function so the three can never
+    // fall out of sync.
+    async function settlePromise(promiseId, status, amtEl, errEl, rowEl) {
+      errEl.textContent = '';
+      let amt = parseFloat(amtEl.value) || 0;
+      if (status === 'broken') amt = 0;
+      if (status === 'partial' && amt <= 0) {
+        errEl.textContent = 'Thoda mila ke liye amount daalein.';
+        return;
+      }
+      rowEl.querySelectorAll('button').forEach(b => b.disabled = true);
+      try {
+        const { error } = await supabase.rpc('settle_promise', {
+          p_promise: promiseId,
+          p_status: status,
+          p_amount: amt,
+          p_note: null
+        });
+        if (error) throw error;
+        await loadFMS();
+      } catch (err) {
+        errEl.textContent = 'Save nahi hua: ' + err.message;
+        rowEl.querySelectorAll('button').forEach(b => b.disabled = false);
+      }
+    }
 
     // ---------------- CALL QUEUE ----------------
     async function loadCallQueue() {
