@@ -101,7 +101,7 @@ const showPage = (pageId, navElement) => {
     dashboard: 'Dashboard', contacts: 'Contacts', mytasks: 'My Tasks', 
     calendar: 'Calendar', orders: 'Orders', quotations: 'Quotations', 
     pipeline: 'Pipeline', campaigns: 'Campaigns', knowledge: 'Knowledge Base', 
-    reports: 'Reports', leaderboard: 'Leaderboard', settings: 'Settings', collections: 'Collections' 
+    reports: 'Reports', leaderboard: 'Leaderboard', settings: 'Settings', collections: 'Collections', vasooli: 'Vasooli' 
   };
   
   const titleEl = document.getElementById('pageTitle');

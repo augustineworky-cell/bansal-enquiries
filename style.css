@@ -1776,3 +1776,17 @@ html.dark .cl-c { background: #431407; color: #FB923C; }
 .cl-recv b { font-size: 20px; color: var(--text); }
 
 @media (max-width: 640px) { .cl-grid { grid-template-columns: 1fr; } }
+
+/* ── Vasooli (embedded app) ──────────────────────────────────
+   Runs in an iframe so its global CSS reset and its second
+   Supabase auth session stay isolated from the CRM. */
+/* .page.active is display:block !important elsewhere, so size the
+   iframe directly rather than relying on a flex parent. */
+#page-vasooli { padding: 0; }
+#vasooliFrame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 64px);
+  border: none;
+  background: #EDEFE7;
+}

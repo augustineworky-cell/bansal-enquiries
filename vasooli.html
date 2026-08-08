@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bansal Material House - Vasooli System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #EDEFE7; --paper-2: #F6F7F1; --rule: #C7CDBD; --rule-hard: #9BA48D;
+      --ink: #14202B; --pen: #C0322A; --tick: #2C6B4C; --haldi: #B58821;
+      --font-heading: 'Arvo', serif; --font-body: 'Inter', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); color: var(--ink); }
+    body { background-color: var(--paper); color: var(--ink); line-height: 1.4; padding-bottom: 60px; max-width: 600px; margin: 0 auto; border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); min-height: 100vh; }
+    header { background: var(--ink); color: var(--paper-2); padding: 12px 16px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--rule-hard); }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    h1 { font-family: var(--font-heading); font-size: 1.1rem; letter-spacing: 0.5px; color: var(--paper); }
+    .user-badge { font-size: 0.75rem; background: rgba(255, 255, 255, 0.15); padding: 2px 8px; border-radius: 2px; display: flex; align-items: center; gap: 8px; color: var(--paper-2); }
+    .btn-logout { background: transparent; border: none; color: #ff9999; cursor: pointer; font-size: 0.75rem; text-decoration: underline; padding: 0; }
+    nav { display: flex; overflow-x: auto; gap: 4px; background: var(--ink); padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); }
+    nav button { background: var(--paper); border: 1px solid var(--rule-hard); border-bottom: none; padding: 8px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; color: var(--ink); opacity: 0.7; }
+    nav button.active { background: var(--paper-2); opacity: 1; border-top: 3px solid var(--haldi); }
+    nav button:focus-visible, .btn:focus-visible { outline: 3px solid var(--haldi); outline-offset: 2px; }
+    .banner-warning { background-color: #fde8e8; border-bottom: 2px solid var(--pen); color: var(--pen); padding: 10px 16px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .container { padding: 12px; }
+    .num, .mono, .amount { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .amount { font-weight: 700; }
+    .card { background: var(--paper-2); border: 1px solid var(--rule-hard); padding: 12px; margin-bottom: 10px; position: relative; }
+    .card-p1 { border-left: 6px solid var(--pen); }
+    .card-p2, .card-p3 { border-left: 6px solid var(--haldi); }
+    .card-p4, .card-p5 { border-left: 6px solid var(--rule-hard); }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .party-title { font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; }
+    .party-city { font-size: 0.75rem; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+    .balance-big { font-size: 1.25rem; color: var(--ink); text-align: right; }
+    .tag { display: inline-block; padding: 2px 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; border: 1px solid var(--rule-hard); background: var(--paper); }
+    .tag-reason { background: var(--paper); border-color: var(--ink); }
+    .tag-danger { background: #fde8e8; color: var(--pen); border-color: var(--pen); }
+    .tag-warning { background: #fef6e0; color: var(--haldi); border-color: var(--haldi); }
+    .tag-success { background: #eaf5ed; color: var(--tick); border-color: var(--tick); }
+    .badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px; font-size: 0.85rem; font-weight: 700; border: 1px solid var(--ink); background: var(--paper); cursor: pointer; text-decoration: none; text-align: center; border-radius: 0; }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-call { background: var(--tick); color: white; border-color: var(--tick); flex: 1; font-size: 1rem; padding: 12px; }
+    .btn-wa { background: #25D366; color: white; border-color: #128C7E; flex: 1; font-size: 1rem; padding: 12px; }
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .btn-sm { padding: 6px 10px; font-size: 0.75rem; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+    input[type="text"], input[type="number"], input[type="date"], input[type="password"], input[type="email"], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--rule-hard); background: #fff; font-size: 0.9rem; border-radius: 0; }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--ink); }
+    .ledger-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.8rem; }
+    .ledger-table th, .ledger-table td { border: 1px solid var(--rule); padding: 6px 8px; text-align: left; }
+    .ledger-table th { background: var(--paper); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; border-bottom: 2px solid var(--rule-hard); }
+    .ledger-table td.num { text-align: right; }
+    .empty-state { padding: 24px 12px; text-align: center; background: var(--paper-2); border: 1px dashed var(--rule-hard); margin: 12px 0; }
+    .empty-state p { font-size: 0.9rem; color: #666; margin-top: 4px; }
+    .loading-state { padding: 20px; text-align: center; font-weight: bold; color: var(--ink); font-family: var(--font-mono); }
+    .delta-neg { color: var(--tick); font-weight: bold; }
+    .delta-pos { color: var(--haldi); font-weight: bold; }
+    .bar-container { height: 12px; background: var(--rule); width: 100%; margin: 6px 0; display: flex; }
+    .bar-fill-cash { background: var(--haldi); height: 100%; }
+    .bar-fill-online { background: var(--tick); height: 100%; }
+    .expandable { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule-hard); }
+    .expandable.open { display: block; }
+    .timeline { margin-top: 10px; border-left: 2px solid var(--rule-hard); padding-left: 10px; font-size: 0.75rem; }
+    .timeline-item { margin-bottom: 8px; position: relative; }
+    .timeline-date { color: #666; font-size: 0.7rem; }
+    .error-text { color: var(--pen); font-size: 0.8rem; margin-top: 4px; font-weight: 600; }
+    .success-text { color: var(--tick); font-size: 0.8rem; margin-top: 4px; font-weight: 600; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body>
+  <header id="app-header">
+    <div class="header-top">
+      <h1>Bansal Material House</h1>
+      <div id="user-info" class="user-badge" style="display:none;">
+        <span id="user-name-display">-</span>
+        <button id="btn-logout" class="btn-logout">Sign out</button>
+      </div>
+    </div>
+    <nav id="app-nav" style="display:none;"></nav>
+  </header>
+  <div id="import-banner" class="banner-warning" style="display:none;">
+    Aaj ka Tally import nahi hua &mdash; ye balance purane hain.
+  </div>
+  <main class="container">
+    <section id="sec-login" class="view-section">
+      <div class="card" style="margin-top: 20px;">
+        <h2 style="font-family: var(--font-heading); margin-bottom: 12px; font-size: 1.2rem;">System Login</h2>
+        <form id="form-login">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="login-email" required placeholder="user@bansal.com">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="login-password" required>
+          </div>
+          <button type="submit" id="btn-login-submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+          <div id="login-error" class="error-text"></div>
+        </form>
+      </div>
+    </section>
+    <section id="sec-queue" class="view-section" style="display:none;"><div id="queue-container"></div></section>
+    <section id="sec-forecast" class="view-section" style="display:none;"><div id="forecast-container"></div></section>
+    <section id="sec-import" class="view-section" style="display:none;"><div id="import-container"></div></section>
+    <section id="sec-parties" class="view-section" style="display:none;"><div id="parties-container"></div></section>
+    <section id="sec-report" class="view-section" style="display:none;"><div id="report-container"></div></section>
+  </main>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    // ================= VASOOLI SUPABASE (separate project) =================
+    const SUPABASE_URL = "https://mdufoigamgyjtnegepkz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kdWZvaWdhbWd5anRuZWdlcGt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxNzI5ODIsImV4cCI6MjEwMTc0ODk4Mn0.4YvT6ZLMiq7Nb6P-JL88vxouK0ZbLklJXhgfVDZNFnU";
+    // =======================================================================
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentUser = null, currentProfile = null, activeTab = null, currentImportId = null, allPartiesData = [];
+
+    function formatMoney(n) { return (n === null || n === undefined) ? '\u20B90' : '\u20B9' + Number(n).toLocaleString('en-IN'); }
+    function formatDate(dStr) { if (!dStr) return '-'; const d = new Date(dStr); if (isNaN(d.getTime())) return dStr; return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getFullYear()).slice(-2)}`; }
+    function getTodayISO() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function addDaysISO(days) { const d = new Date(); d.setDate(d.getDate() + days); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+    async function initApp() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) { currentUser = session.user; await fetchProfile(); } else { showView('sec-login'); }
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) { currentUser = session.user; await fetchProfile(); }
+        else if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; document.getElementById('user-info').style.display = 'none'; document.getElementById('app-nav').style.display = 'none'; document.getElementById('import-banner').style.display = 'none'; showView('sec-login'); }
+      });
+    }
+
+    async function fetchProfile() {
+      try {
+        const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+        if (error || !data) { showLoginError("Profile not found. Ask owner for access."); await supabase.auth.signOut(); return; }
+        currentProfile = data; document.getElementById('user-name-display').textContent = `${currentProfile.full_name} (${currentProfile.role})`;
+        document.getElementById('user-info').style.display = 'flex'; setupNavigation(); checkImportStatus();
+      } catch (err) { showLoginError("Error fetching user profile."); }
+    }
+
+    function setupNavigation() {
+      const nav = document.getElementById('app-nav'); nav.innerHTML = ''; nav.style.display = 'flex';
+      const role = currentProfile.role, tabs = [];
+      if (role === 'owner' || role === 'caller') { tabs.push({ id: 'queue', label: 'Aaj ki List', section: 'sec-queue' }, { id: 'forecast', label: 'Paisa Forecast', section: 'sec-forecast' }); }
+      if (role === 'owner' || role === 'accountant') { tabs.push({ id: 'import', label: 'Tally Import', section: 'sec-import' }); }
+      if (role === 'owner' || role === 'caller') { tabs.push({ id: 'parties', label: 'Saari Party', section: 'sec-parties' }); }
+      if (role === 'owner') { tabs.push({ id: 'report', label: 'Report', section: 'sec-report' }); }
+      tabs.forEach((tab) => {
+        const btn = document.createElement('button'); btn.textContent = tab.label; btn.dataset.section = tab.section; btn.dataset.tabId = tab.id;
+        btn.onclick = () => switchTab(tab.id, tab.section); nav.appendChild(btn);
+      });
+      if (tabs.length > 0) switchTab(tabs[0].id, tabs[0].section);
+    }
+
+    function switchTab(tabId, sectionId) {
+      activeTab = tabId; document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.tabId === tabId));
+      showView(sectionId);
+      if (tabId === 'queue') loadCallQueue(); if (tabId === 'forecast') loadForecast();
+      if (tabId === 'import') renderImportScreen(); if (tabId === 'parties') loadParties(); if (tabId === 'report') loadReport();
+    }
+
+    function showView(sectionId) { document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none'); const target = document.getElementById(sectionId); if (target) target.style.display = 'block'; }
+
+    async function checkImportStatus() {
+      try {
+        const { data } = await supabase.from('imports').select('as_of_date').eq('status', 'applied').order('as_of_date', { ascending: false }).limit(1);
+        const banner = document.getElementById('import-banner');
+        if (data && data.length > 0) { banner.style.display = data[0].as_of_date < getTodayISO() ? 'flex' : 'none'; } else { banner.style.display = 'flex'; }
+      } catch (e) { console.error("Import check error:", e); }
+    }
+
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault(); const errDiv = document.getElementById('login-error'), submitBtn = document.getElementById('btn-login-submit');
+      errDiv.textContent = ''; submitBtn.disabled = true;
+      const email = document.getElementById('login-email').value, password = document.getElementById('login-password').value;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { errDiv.textContent = error.message; submitBtn.disabled = false; }
+    });
+    document.getElementById('btn-logout').addEventListener('click', async () => await supabase.auth.signOut());
+    function showLoginError(msg) { const errDiv = document.getElementById('login-error'); if (errDiv) errDiv.textContent = msg; }
+
+    // ---------------- CALL QUEUE ----------------
+    async function loadCallQueue() {
+      const container = document.getElementById('queue-container'); container.innerHTML = '<div class="loading-state">Call queue loading...</div>';
+      try {
+        const { data: queue, error } = await supabase.from('v_call_queue').select('*').order('priority', { ascending: true }).order('current_balance', { ascending: false });
+        if (error) throw error;
+        if (!queue || queue.length === 0) { container.innerHTML = `<div class="empty-state"><h3>Koi call baki nahi hai!</h3><p>Sabhi parties se baat ho chuki hai ya list khali hai.</p></div>`; return; }
+        container.innerHTML = ''; queue.forEach(item => container.appendChild(createQueueCard(item)));
+      } catch (err) { container.innerHTML = `<div class="error-text">Failed to load queue: ${err.message}</div>`; }
+    }
+
+    function createQueueCard(item) {
+      const card = document.createElement('div'); card.className = `card card-p${Math.min(item.priority || 5, 5)}`; card.id = `card-party-${item.id}`;
+      const totalPromises = (item.kept || 0) + (item.broke || 0), scoreStr = `vaada ${item.kept || 0}/${totalPromises}`;
+      card.innerHTML = `
+        <div class="card-header" style="cursor: pointer;">
+          <div><div class="party-title">${item.display_name}</div><div class="party-city">${item.city || 'No City'} &bull; <span class="num">${item.phone || 'No Phone'}</span></div></div>
+          <div><div class="balance-big amount">${formatMoney(item.current_balance)}</div></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+          <div><span class="tag tag-reason">${item.reason || 'Followup'}</span><span class="tag" style="margin-left:4px;">${scoreStr}</span></div>
+          <div class="badges">${item.on_hold ? '<span class="tag tag-danger">HOLD</span>' : ''}${item.has_dispute ? '<span class="tag tag-warning">DISPUTE</span>' : ''}${item.over_limit ? '<span class="tag tag-warning">LIMIT EXCEEDED</span>' : ''}</div>
+        </div>
+        <div class="expandable" id="expand-${item.id}">
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <a href="tel:${item.phone}" class="btn btn-call">Call</a>
+            <a href="https://wa.me/91${(item.phone||'').replace(/\D/g,'')}" target="_blank" rel="noopener" class="btn btn-wa">WhatsApp</a>
+          </div>
+          <div style="background: var(--paper); padding: 10px; border: 1px solid var(--rule-hard); margin-bottom: 12px;">
+            <div style="font-weight:bold; font-size: 0.8rem; text-transform:uppercase; margin-bottom: 8px;">Vaada / Call Entry</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div class="form-group"><label>Cash mein (&#8377;)</label><input type="number" class="cash-input" value="0" min="0" inputmode="decimal"></div>
+              <div class="form-group"><label>Online mein (&#8377;)</label><input type="number" class="online-input" value="0" min="0" inputmode="decimal"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div class="form-group"><label>Online Kaise</label><select class="mode-select"><option value="">-- Mode --</option><option value="upi">UPI</option><option value="neft_rtgs">NEFT/RTGS</option><option value="cheque">Cheque</option></select></div>
+              <div class="form-group"><label>Kis Din</label><input type="date" class="date-input" value="${getTodayISO()}"></div>
+            </div>
+            <div class="form-group"><label>Note</label><textarea class="note-input" rows="2" placeholder="Kya bola..."></textarea></div>
+            <div class="calc-summary" style="font-size:0.8rem; font-weight:bold; margin-bottom:8px; color:var(--ink);">Total vaada <span class="tot-val amount">&#8377;0</span> &middot; <span class="cash-pct">0</span>% cash</div>
+            <button class="btn btn-primary btn-save-promise" style="width:100%; margin-bottom:10px;">Vaada save karo</button>
+            <div class="form-error error-text"></div>
+            <div style="font-size:0.7rem; font-weight:bold; text-transform:uppercase; margin-top:10px; margin-bottom:4px; color:#555;">Vaada nahi mila to:</div>
+            <div class="btn-grid">
+              <button class="btn btn-sm btn-no-answer">Nahi uthaya</button>
+              <button class="btn btn-sm btn-call-back">Baad mein</button>
+              <button class="btn btn-sm btn-dispute" style="color:var(--pen);">Dispute</button>
+              <button class="btn btn-sm btn-refused" style="color:var(--pen);">Mana kar diya</button>
+            </div>
+            <div class="dispute-form-box" style="display:none; margin-top:10px; padding:8px; background:#fff; border:1px solid var(--pen);">
+              <div style="font-weight:bold; font-size:0.75rem; color:var(--pen); margin-bottom:6px;">DISPUTE DETAILS</div>
+              <div class="form-group"><label>Reason</label><select class="dispute-reason"><option value="damage">Damage</option><option value="shortage">Shortage</option><option value="rate_diff">Rate Difference</option><option value="freight">Freight Issue</option><option value="scheme">Scheme / Discount</option><option value="quality">Quality Issue</option><option value="other">Other</option></select></div>
+              <div class="form-group"><label>Dispute Amount (&#8377;)</label><input type="number" class="dispute-amount" value="0" inputmode="decimal"></div>
+              <button class="btn btn-sm btn-primary btn-submit-dispute" style="width:100%;">Submit Dispute</button>
+            </div>
+          </div>
+          <div style="font-size:0.75rem; font-weight:bold; text-transform:uppercase; margin-top:8px;">Purane Follow-ups</div>
+          <div class="timeline" id="timeline-${item.id}">Loading activity...</div>
+        </div>`;
+      card.querySelector('.card-header').onclick = () => { const exp = card.querySelector(`#expand-${item.id}`); if (!exp.classList.contains('open')) loadTimeline(item.id, card.querySelector(`#timeline-${item.id}`)); exp.classList.toggle('open'); };
+      const cashIn = card.querySelector('.cash-input'), onlineIn = card.querySelector('.online-input'), totVal = card.querySelector('.tot-val'), cashPct = card.querySelector('.cash-pct');
+      const updateCalc = () => { const c = parseFloat(cashIn.value) || 0, o = parseFloat(onlineIn.value) || 0, tot = c + o; totVal.textContent = formatMoney(tot); cashPct.textContent = tot > 0 ? Math.round((c / tot) * 100) : 0; };
+      cashIn.oninput = updateCalc; onlineIn.oninput = updateCalc;
+      card.querySelector('.btn-save-promise').onclick = () => handleSavePromise(item, card);
+      card.querySelector('.btn-no-answer').onclick = () => handleQuickAction(item.id, item.current_balance, 'no_answer');
+      card.querySelector('.btn-call-back').onclick = () => handleQuickAction(item.id, item.current_balance, 'will_call_back');
+      card.querySelector('.btn-refused').onclick = () => handleQuickAction(item.id, item.current_balance, 'refused');
+      const disputeBox = card.querySelector('.dispute-form-box');
+      card.querySelector('.btn-dispute').onclick = () => { disputeBox.style.display = disputeBox.style.display === 'none' ? 'block' : 'none'; };
+      card.querySelector('.btn-submit-dispute').onclick = () => handleDisputeSubmit(item.id, item.current_balance, card);
+      return card;
+    }
+
+    async function loadTimeline(partyId, container) {
+      try {
+        const { data, error } = await supabase.from('follow_ups').select('*').eq('party_id', partyId).order('called_at', { ascending: false }).limit(8);
+        if (error) throw error;
+        container.innerHTML = (!data || data.length === 0) ? '<div style="color:#777;">Koi purana record nahi hai.</div>' : data.map(f => `<div class="timeline-item"><div class="timeline-date">${formatDate(f.called_at)} (${f.channel || 'call'}) - <strong>${f.outcome}</strong></div><div>${f.note || 'No note added.'}</div></div>`).join('');
+      } catch (err) { container.innerHTML = `<div class="error-text">Timeline load failed</div>`; }
+    }
+
+    async function handleSavePromise(party, cardEl) {
+      const errBox = cardEl.querySelector('.form-error'); errBox.textContent = '';
+      const cashAmt = parseFloat(cardEl.querySelector('.cash-input').value) || 0, onlineAmt = parseFloat(cardEl.querySelector('.online-input').value) || 0, onlineMode = cardEl.querySelector('.mode-select').value, dueOnDate = cardEl.querySelector('.date-input').value, noteTxt = cardEl.querySelector('.note-input').value;
+      if ((cashAmt + onlineAmt) <= 0) { errBox.textContent = "Kripya valid vaada amount daalein."; return; }
+      if (!dueOnDate) { errBox.textContent = "Kripya vaade ki tareekh select karein."; return; }
+      if (onlineAmt > 0 && !onlineMode) { errBox.textContent = "Online mode select karna zaroori hai."; return; }
+      const btn = cardEl.querySelector('.btn-save-promise'); btn.disabled = true;
+      try {
+        const { data: fuData, error: fuErr } = await supabase.from('follow_ups').insert({ party_id: party.id, by_user: currentUser.id, channel: 'call', outcome: 'promised', balance_then: party.current_balance, note: noteTxt, next_action_on: dueOnDate }).select().single();
+        if (fuErr) throw fuErr;
+        const { data: existingProms, error: checkErr } = await supabase.from('promises').select('id').eq('party_id', party.id).eq('status', 'open');
+        if (checkErr) throw checkErr;
+        if (existingProms && existingProms.length > 0) {
+          const { error: upErr } = await supabase.from('promises').update({ follow_up_id: fuData.id, promised_on: getTodayISO(), due_on: dueOnDate, cash_amount: cashAmt, online_amount: onlineAmt, online_mode: onlineAmt > 0 ? onlineMode : null, created_by: currentUser.id }).eq('id', existingProms[0].id);
+          if (upErr) throw upErr;
+        } else {
+          const { error: insErr } = await supabase.from('promises').insert({ party_id: party.id, follow_up_id: fuData.id, promised_on: getTodayISO(), due_on: dueOnDate, cash_amount: cashAmt, online_amount: onlineAmt, online_mode: onlineAmt > 0 ? onlineMode : null, status: 'open', created_by: currentUser.id });
+          if (insErr) throw insErr;
+        }
+        await loadCallQueue();
+      } catch (err) { errBox.textContent = "Save karne mein dikkat aayi: " + err.message; btn.disabled = false; }
+    }
+
+    async function handleQuickAction(partyId, currentBalance, outcomeType) {
+      try {
+        const { error } = await supabase.from('follow_ups').insert({ party_id: partyId, by_user: currentUser.id, channel: 'call', outcome: outcomeType, balance_then: currentBalance, next_action_on: addDaysISO(3) });
+        if (error) throw error; await loadCallQueue();
+      } catch (err) { alert("Action log error: " + err.message); }
+    }
+
+    async function handleDisputeSubmit(partyId, currentBalance, cardEl) {
+      const reason = cardEl.querySelector('.dispute-reason').value, amt = parseFloat(cardEl.querySelector('.dispute-amount').value) || 0, detail = cardEl.querySelector('.note-input').value;
+      try {
+        const { error: dispErr } = await supabase.from('disputes').insert({ party_id: partyId, reason: reason, amount: amt, status: 'open', detail: detail, raised_on: getTodayISO() });
+        if (dispErr) throw dispErr;
+        const { error: fuErr } = await supabase.from('follow_ups').insert({ party_id: partyId, by_user: currentUser.id, channel: 'call', outcome: 'dispute', balance_then: currentBalance, note: `Dispute: ${reason} (${formatMoney(amt)}). ${detail}`, next_action_on: addDaysISO(3) });
+        if (fuErr) throw fuErr; await loadCallQueue();
+      } catch (err) { alert("Dispute log error: " + err.message); }
+    }
+
+    // ---------------- FORECAST ----------------
+    async function loadForecast() {
+      const container = document.getElementById('forecast-container'); container.innerHTML = '<div class="loading-state">Forecast loading...</div>';
+      try {
+        const { data: weekData } = await supabase.from('v_forecast_week').select('*').single();
+        const { data: forecastList } = await supabase.from('v_forecast').select('*').order('due_on', { ascending: true });
+        let html = '';
+        if (weekData) {
+          const cash = Number(weekData.cash || 0), online = Number(weekData.online || 0), tot = Number(weekData.total || 0);
+          const cashPct = tot > 0 ? (cash / tot) * 100 : 0, onlinePct = tot > 0 ? (online / tot) * 100 : 0;
+          html += `<div class="card" style="border-top: 4px solid var(--ink);"><div style="font-family: var(--font-heading); font-size: 0.9rem; text-transform: uppercase;">Agle 7 Din Ka Vaada</div><div class="amount" style="font-size: 1.6rem; margin: 4px 0;">${formatMoney(tot)}</div><div class="bar-container"><div class="bar-fill-cash" style="width: ${cashPct}%;"></div><div class="bar-fill-online" style="width: ${onlinePct}%;"></div></div><div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold; margin-top:4px;"><span style="color:var(--haldi);">Cash: ${formatMoney(cash)} (${Math.round(cashPct)}%)</span><span style="color:var(--tick);">Online: ${formatMoney(online)} (${Math.round(onlinePct)}%)</span></div></div>`;
+        }
+        if (!forecastList || forecastList.length === 0) { html += `<div class="empty-state"><h3>Abhi koi vaada nahi</h3><p>Call karke poocho &mdash; kitna cash, kitna online, kis din.</p></div>`; }
+        else { forecastList.forEach(item => { html += `<div class="card"><div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--rule); padding-bottom:4px; margin-bottom:6px;"><span style="font-family:var(--font-heading); font-weight:bold;">${formatDate(item.due_on)}</span><span class="amount" style="font-size:1.1rem;">${formatMoney(item.total)}</span></div><div style="font-size:0.8rem; margin-bottom:6px;">${item.cash ? `<div>Cash: <span class="amount">${formatMoney(item.cash)}</span></div>` : ''}${item.online ? `<div>Online: <span class="amount">${formatMoney(item.online)}</span></div>` : ''}</div><div style="font-size:0.75rem; color:#555; background:var(--paper); padding:4px 6px;"><strong>${item.parties || 0}</strong> party ka vaada</div></div>`; }); }
+        container.innerHTML = html;
+      } catch (err) { container.innerHTML = `<div class="error-text">Failed to load forecast: ${err.message}</div>`; }
+    }
+
+    // ---------------- TALLY IMPORT ----------------
+    function renderImportScreen() {
+      const container = document.getElementById('import-container');
+      container.innerHTML = `<div class="card"><div style="font-family: var(--font-heading); font-size: 1rem; margin-bottom: 8px;">Tally Ledger Paste</div><p style="font-size:0.8rem; margin-bottom:8px; color:#555;">Tally/Excel se party ka naam aur balance copy karke yahan paste karein, ya CSV upload karein.</p><div class="form-group"><textarea id="import-paste-text" rows="8" placeholder="ATC&#9;2497713&#10;Niyaz&#9;598455"></textarea></div><div class="form-group"><label>Ya CSV File Upload Karein</label><input type="file" id="import-file-input" accept=".csv, .txt"></div><button class="btn btn-primary" id="btn-parse-import" style="width:100%;">Data Check Karo</button></div><div id="import-preview-area"></div>`;
+      document.getElementById('import-file-input').onchange = (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = (evt) => document.getElementById('import-paste-text').value = evt.target.result; r.readAsText(f); };
+      document.getElementById('btn-parse-import').onclick = parseImportInput;
+    }
+
+    function parseImportInput() {
+      const text = document.getElementById('import-paste-text').value, previewArea = document.getElementById('import-preview-area');
+      if (!text.trim()) { previewArea.innerHTML = '<div class="error-text">Kripya data paste ya upload karein.</div>'; return; }
+      const lines = text.split(/\r?\n/), parsedRows = [], skipKeywords = ['particulars', 'party', 'name', 'total', 'grand total', 'opening', 'closing'];
+      lines.forEach(line => {
+        if (!line.trim()) return; const fields = line.includes('\t') ? line.split('\t') : line.split(','); if (fields.length < 2) return;
+        const rawName = fields[0].replace(/^["']|["']$/g, '').trim(); if (!rawName || skipKeywords.some(k => rawName.toLowerCase() === k)) return;
+        let amount = null;
+        for (let i = fields.length - 1; i >= 1; i--) { let clean = fields[i].replace(/[\u20B9\s,"']/g, '').trim(), parsed = parseFloat(clean); if (!isNaN(parsed) && parsed !== 0) { amount = Math.abs(parsed); break; } }
+        if (amount !== null) parsedRows.push({ name: rawName, balance: amount });
+      });
+      if (parsedRows.length === 0) { previewArea.innerHTML = '<div class="error-text">Koi valid party/balance line nahi mili. Do column chahiye: naam aur amount.</div>'; return; }
+      const totalBalance = parsedRows.reduce((acc, r) => acc + r.balance, 0);
+      previewArea.innerHTML = `<div class="card" style="border-top:4px solid var(--haldi);"><div style="font-weight:bold; font-size:0.9rem;">Parsed Preview</div><div style="margin: 6px 0; font-size:0.85rem;">Rows: <strong>${parsedRows.length}</strong> | Total Balance: <strong class="amount">${formatMoney(totalBalance)}</strong></div><div style="display:flex; gap:8px;"><button class="btn btn-primary" id="btn-confirm-stage" style="flex:1;">Aage Badho</button><button class="btn" id="btn-cancel-stage" style="flex:1;">Radd Karo</button></div></div>`;
+      document.getElementById('btn-cancel-stage').onclick = () => { previewArea.innerHTML = ''; };
+      document.getElementById('btn-confirm-stage').onclick = () => processStaging(parsedRows);
+    }
+
+    async function processStaging(rows) {
+      const previewArea = document.getElementById('import-preview-area'); previewArea.innerHTML = '<div class="loading-state">Matching with database...</div>';
+      try {
+        const { data: impId, error: stageErr } = await supabase.rpc('stage_import', { p_rows: rows, p_as_of: getTodayISO() });
+        if (stageErr) throw stageErr; currentImportId = impId;
+        await renderImportReview();
+      } catch (err) { previewArea.innerHTML = `<div class="error-text">Staging failed: ${err.message}</div>`; }
+    }
+
+    async function renderImportReview() {
+      const previewArea = document.getElementById('import-preview-area'); previewArea.innerHTML = '<div class="loading-state">Review loading...</div>';
+      try {
+        const { data: importRows, error } = await supabase.from('import_rows').select('*').eq('import_id', currentImportId);
+        if (error) throw error;
+        const matchedChanged = importRows.filter(r => r.resolution === 'matched' && Number(r.delta || 0) !== 0), ambiguous = importRows.filter(r => r.resolution === 'ambiguous');
+        const totalPaid = matchedChanged.filter(r => Number(r.delta) < 0).reduce((s, r) => s - Number(r.delta), 0);
+        const totalSold = matchedChanged.filter(r => Number(r.delta) > 0).reduce((s, r) => s + Number(r.delta), 0);
+        let html = `<div class="card"><div style="font-weight:bold; font-size:0.9rem; margin-bottom:6px;">1. Kya Badla</div><div style="font-size:0.85rem; margin-bottom:6px;">Paisa aaya: <strong class="delta-neg">${formatMoney(totalPaid)}</strong> &nbsp;|&nbsp; Naya maal: <strong class="delta-pos">${formatMoney(totalSold)}</strong></div>${matchedChanged.length === 0 ? '<p style="font-size:0.8rem; color:#666;">Koi balance badla nahi.</p>' : `<table class="ledger-table"><thead><tr><th>Party</th><th>Purana</th><th>Naya</th><th>Farak</th></tr></thead><tbody>${matchedChanged.map(r => `<tr><td>${r.raw_name}</td><td class="num">${formatMoney(r.prev_balance)}</td><td class="num">${formatMoney(r.balance)}</td><td class="num ${Number(r.delta) < 0 ? 'delta-neg' : 'delta-pos'}">${Number(r.delta) < 0 ? '\u2212' : '+'}${formatMoney(Math.abs(r.delta))}</td></tr>`).join('')}</tbody></table>`}</div><div class="card" style="border-left:4px solid var(--pen);"><div style="font-weight:bold; font-size:0.9rem; margin-bottom:6px;">2. Match Nahi Hui</div><div style="font-size:0.85rem; font-weight:bold; margin-bottom:10px;">${ambiguous.length} rows abhi baaki hain</div><div id="ambiguous-rows-list"></div></div><div class="card" style="background:var(--paper);"><button class="btn btn-primary" id="btn-apply-import" style="width:100%; font-size:1rem; padding:12px;" ${ambiguous.length > 0 ? 'disabled' : ''}>Import Karo</button><div id="apply-error" class="error-text"></div></div>`;
+        previewArea.innerHTML = html;
+        if (ambiguous.length > 0) {
+          const listEl = document.getElementById('ambiguous-rows-list');
+          for (const row of ambiguous) {
+            const rowBox = document.createElement('div'); rowBox.style.cssText = 'background:#fff; border:1px solid var(--rule-hard); padding:8px; margin-bottom:8px; font-size:0.8rem;';
+            rowBox.innerHTML = `<div><strong>${row.raw_name}</strong> (${formatMoney(row.balance)})</div><div class="suggestions-area" style="margin-top:6px;">Suggestions loading...</div><div style="display:flex; gap:6px; margin-top:6px;"><button class="btn btn-sm btn-as-new">Nayi party hai</button><button class="btn btn-sm btn-ignore">Chhod do</button></div>`;
+            listEl.appendChild(rowBox);
+            fetchSuggestions(row.raw_name, rowBox.querySelector('.suggestions-area'), row.id);
+            rowBox.querySelector('.btn-as-new').onclick = async () => { await supabase.rpc('resolve_row_as_new', { p_row: row.id }); renderImportReview(); };
+            rowBox.querySelector('.btn-ignore').onclick = async () => { await supabase.rpc('ignore_row', { p_row: row.id }); renderImportReview(); };
+          }
+        }
+        document.getElementById('btn-apply-import').onclick = applyFinalImport;
+      } catch (err) { previewArea.innerHTML = `<div class="error-text">Review error: ${err.message}</div>`; }
+    }
+
+    async function fetchSuggestions(rawName, container, rowId) {
+      try {
+        const { data: suggestions } = await supabase.rpc('suggest_party', { p_name: rawName });
+        if (!suggestions || suggestions.length === 0) { container.innerHTML = '<span style="color:#777;">Koi match suggestion nahi mila.</span>'; return; }
+        container.innerHTML = '<strong>Ye party to nahi?</strong><br>';
+        suggestions.slice(0, 5).forEach(s => {
+          const btn = document.createElement('button'); btn.className = 'btn btn-sm'; btn.style.cssText = 'margin:2px; background:var(--paper-2);'; btn.textContent = `${s.display_name} (${formatMoney(s.current_balance)})`;
+          btn.onclick = async () => { await supabase.rpc('resolve_row_to_party', { p_row: rowId, p_party: s.party_id }); renderImportReview(); };
+          container.appendChild(btn);
+        });
+      } catch (e) { container.innerHTML = '<span class="error-text">Suggestion load error</span>'; }
+    }
+
+    async function applyFinalImport() {
+      const errBox = document.getElementById('apply-error'), btn = document.getElementById('btn-apply-import');
+      errBox.textContent = ''; btn.disabled = true;
+      try {
+        const { data, error } = await supabase.rpc('apply_import', { p_import: currentImportId });
+        if (error) throw error;
+        const res = Array.isArray(data) ? (data[0] || {}) : (data || {});
+        document.getElementById('import-preview-area').innerHTML = `<div class="card" style="border-top:4px solid var(--tick); text-align:center; padding:20px;"><h3 style="color:var(--tick); font-family:var(--font-heading);">Import Ho Gaya</h3><p style="margin-top:8px; font-size:0.9rem;">Paisa aaya: <strong>${formatMoney(res.paid)}</strong><br>Naya maal: <strong>${formatMoney(res.sold)}</strong><br>Parties: <strong>${res.touched || 0}</strong></p></div>`;
+        checkImportStatus();
+      } catch (err) { errBox.textContent = "Import apply nahi ho paya: " + err.message; btn.disabled = false; }
+    }
+
+    // ---------------- PARTIES ----------------
+    async function loadParties() {
+      const container = document.getElementById('parties-container'); container.innerHTML = '<div class="loading-state">Party status loading...</div>';
+      try {
+        const { data: conc } = await supabase.from('v_concentration').select('*').single();
+        const { data: parties, error } = await supabase.from('v_party_status').select('*').order('current_balance', { ascending: false });
+        if (error) throw error; allPartiesData = parties || [];
+        let html = conc ? `<div class="card" style="border-top:4px solid var(--haldi);"><div style="font-size:0.85rem; font-weight:bold;">Top 10 party = <span class="amount">${formatMoney(conc.top10)}</span> &mdash; kul bakaya ka ${conc.top10_pct}%</div><div class="bar-container"><div class="bar-fill-cash" style="width:${conc.top10_pct}%;"></div></div></div>` : '';
+        html += `<div style="display:flex; gap:8px; margin-bottom:10px;"><input type="text" id="party-search-input" placeholder="Party dhoondo..." style="flex:1;"><button class="btn btn-sm" id="btn-export-csv">Export CSV</button></div><div id="parties-list-box"></div>`;
+        container.innerHTML = html;
+        document.getElementById('party-search-input').oninput = () => {
+          const q = document.getElementById('party-search-input').value.toLowerCase();
+          renderPartiesList(allPartiesData.filter(p => (p.display_name || '').toLowerCase().includes(q) || (p.city || '').toLowerCase().includes(q)));
+        };
+        document.getElementById('btn-export-csv').onclick = exportPartiesCSV;
+        renderPartiesList(allPartiesData);
+      } catch (err) { container.innerHTML = `<div class="error-text">Parties load error: ${err.message}</div>`; }
+    }
+
+    function renderPartiesList(list) {
+      const listBox = document.getElementById('parties-list-box');
+      if (!list || list.length === 0) { listBox.innerHTML = '<div class="empty-state">Koi party nahi mili.</div>'; return; }
+      listBox.innerHTML = '';
+      list.forEach(p => {
+        const card = document.createElement('div'), noPhone = !p.phone; card.className = 'card'; if (noPhone) card.style.border = '1px solid var(--pen)';
+        card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:flex-start; cursor:pointer;" class="party-item-header"><div><div class="party-title" style="${noPhone ? 'color:var(--pen);' : ''}">${p.display_name}${noPhone ? ' (PHONE NAHI)' : ''}</div><div class="party-city">${p.city || 'No City'} &bull; <span class="num">${p.phone || 'No Phone'}</span></div></div><div class="balance-big amount">${formatMoney(p.current_balance)}</div></div><div class="party-edit-box expandable" id="edit-party-${p.id}"></div>`;
+        card.querySelector('.party-item-header').onclick = () => { const editBox = card.querySelector(`#edit-party-${p.id}`); if (!editBox.classList.contains('open')) renderPartyEditForm(p, editBox); editBox.classList.toggle('open'); };
+        listBox.appendChild(card);
+      });
+    }
+
+    function renderPartyEditForm(party, container) {
+      const isOwner = currentProfile && currentProfile.role === 'owner';
+      if (!isOwner) { container.innerHTML = `<div style="font-size:0.8rem; background:var(--paper); padding:8px; margin-top:8px;"><div>Alt Phone: ${party.alt_phone || '-'}</div><div>Credit Days: ${party.credit_days || 0}</div><div>Credit Limit: ${formatMoney(party.credit_limit)}</div><div style="color:#777; margin-top:4px;">Sirf owner party ki detail badal sakta hai.</div></div>`; return; }
+      container.innerHTML = `<div style="background:var(--paper); padding:10px; border:1px solid var(--rule-hard); margin-top:8px;"><div style="font-weight:bold; font-size:0.8rem; text-transform:uppercase; margin-bottom:6px;">Party ki detail</div><div class="form-group"><label>Naam</label><input type="text" class="edit-name" value="${party.display_name || ''}"></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;"><div class="form-group"><label>Phone</label><input type="text" class="edit-phone" value="${party.phone || ''}" inputmode="tel"></div><div class="form-group"><label>Alt Phone</label><input type="text" class="edit-alt-phone" value="${party.alt_phone || ''}" inputmode="tel"></div></div><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;"><div class="form-group"><label>Sheher</label><input type="text" class="edit-city" value="${party.city || ''}"></div><div class="form-group"><label>Credit Days</label><input type="number" class="edit-days" value="${party.credit_days || 0}"></div><div class="form-group"><label>Credit Limit</label><input type="number" class="edit-limit" value="${party.credit_limit || 0}"></div></div><button class="btn btn-primary btn-save-party" style="width:100%;">Save karo</button><div class="save-status"></div></div>`;
+      container.querySelector('.btn-save-party').onclick = async () => {
+        const statusEl = container.querySelector('.save-status'), saveBtn = container.querySelector('.btn-save-party');
+        statusEl.innerHTML = 'Saving...'; saveBtn.disabled = true;
+        try {
+          const { error } = await supabase.from('parties').update({ display_name: container.querySelector('.edit-name').value, phone: container.querySelector('.edit-phone').value, alt_phone: container.querySelector('.edit-alt-phone').value, city: container.querySelector('.edit-city').value, credit_days: parseInt(container.querySelector('.edit-days').value) || 30, credit_limit: parseFloat(container.querySelector('.edit-limit').value) || null }).eq('id', party.id);
+          if (error) throw error; statusEl.innerHTML = '<span class="success-text">Save ho gaya</span>'; await loadParties();
+        } catch (err) { statusEl.innerHTML = `<span class="error-text">Save failed: ${err.message}</span>`; saveBtn.disabled = false; }
+      };
+    }
+
+    function exportPartiesCSV() {
+      if (!allPartiesData || allPartiesData.length === 0) return;
+      const rows = [['party', 'city', 'phone', 'balance', 'promise_total', 'promise_due', 'kept', 'broke']];
+      allPartiesData.forEach(p => rows.push([p.display_name || '', p.city || '', p.phone || '', p.current_balance || 0, p.promise_total || '', p.promise_due || '', p.kept || 0, p.broke || 0]));
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const url = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+      const link = document.createElement('a'); link.href = url; link.download = `parties_${getTodayISO()}.csv`; link.click(); URL.revokeObjectURL(url);
+    }
+
+    // ---------------- REPORT ----------------
+    async function loadReport() {
+      const container = document.getElementById('report-container'); container.innerHTML = '<div class="loading-state">Reports loading...</div>';
+      try {
+        const { data: reliability } = await supabase.from('v_reliability').select('*').order('keep_pct', { ascending: true });
+        const { data: monthly } = await supabase.from('v_collections_monthly').select('*');
+        const { data: activeHolds } = await supabase.from('credit_holds').select('*').is('released_at', null);
+        container.innerHTML = `<div class="card"><div style="font-family:var(--font-heading); font-size:1rem; margin-bottom:6px;">Vaada Reliability</div><p style="font-size:0.75rem; color:#555; margin-bottom:8px;">Sabse zyada vaada todne wali party sabse upar. Yahi maal band karne ki list hai.</p><table class="ledger-table"><thead><tr><th>Party</th><th>Balance</th><th>Kept/Missed</th><th>%</th><th>Action</th></tr></thead><tbody>${(!reliability || reliability.length === 0) ? '<tr><td colspan="5">Abhi data nahi &mdash; kam se kam 2 vaade chahiye har party ke.</td></tr>' : reliability.map(r => { const hold = activeHolds && activeHolds.find(h => h.party_id === r.id); return `<tr><td>${r.display_name}</td><td class="num">${formatMoney(r.current_balance)}</td><td class="num">${r.kept || 0}/${r.missed || 0}</td><td class="num">${r.keep_pct || 0}%</td><td>${hold ? `<button class="btn btn-sm btn-release-hold" data-party="${r.id}">Kholo</button>` : `<button class="btn btn-sm btn-place-hold" style="color:var(--pen);" data-party="${r.id}">Maal Band</button>`}</td></tr>`; }).join('')}</tbody></table></div><div class="card"><div style="font-family:var(--font-heading); font-size:1rem; margin-bottom:6px;">Mahine ki Vasooli</div><table class="ledger-table"><thead><tr><th>Month</th><th>Aaya</th><th>Bheja</th><th>Parties</th></tr></thead><tbody>${(!monthly || monthly.length === 0) ? '<tr><td colspan="4">Abhi data nahi</td></tr>' : monthly.map(m => `<tr><td>${m.month}</td><td class="num delta-neg">${formatMoney(m.collected)}</td><td class="num">${formatMoney(m.sold)}</td><td class="num">${m.parties}</td></tr>`).join('')}</tbody></table></div><div class="card"><div style="font-family:var(--font-heading); font-size:1rem; margin-bottom:6px;">Bill-wise Aging</div><div class="empty-state"><h3>Aging abhi nahi ban sakti</h3><p>Iske liye Tally se bill-wise Outstandings export chahiye &mdash; bill number aur bill date ke saath.</p></div></div>`;
+        container.querySelectorAll('.btn-place-hold').forEach(btn => btn.onclick = () => placeCreditHold(btn.dataset.party));
+        container.querySelectorAll('.btn-release-hold').forEach(btn => btn.onclick = () => releaseCreditHold(btn.dataset.party));
+      } catch (err) { container.innerHTML = `<div class="error-text">Report load error: ${err.message}</div>`; }
+    }
+
+    async function placeCreditHold(partyId) {
+      const reason = prompt("Maal band karne ka kaaran:"); if (!reason) return;
+      try { const { error } = await supabase.from('credit_holds').insert({ party_id: partyId, reason: reason, placed_by: currentUser.id }); if (error) throw error; loadReport(); } catch (err) { alert("Hold apply error: " + err.message); }
+    }
+
+    async function releaseCreditHold(partyId) {
+      try { const { error } = await supabase.from('credit_holds').update({ released_at: new Date().toISOString(), released_by: currentUser.id }).eq('party_id', partyId).is('released_at', null); if (error) throw error; loadReport(); } catch (err) { alert("Release hold error: " + err.message); }
+    }
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
